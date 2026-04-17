@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="description" content="Roda ColorADD + CDU">
+  <title>Roda ColorADD + CDU | Cor para Todxs</title>
+  <style>
+    :root {
+      --azul: #2563EB; --amarelo: #F59E0B; --vermelho: #DC2626;
+      --preto: #111827; --branco: #F9FAFB; --fundo: #F3F4F6;
+      --texto: #1F2937; --foco: #7C3AED; --sucesso: #059669;
+      --verde: #10B981; --laranja: #F97316; --roxo: #8B5CF6;
+      --castanho: #92400E; --rosa: #EC4899; --cinzento: #6B7280;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Atkinson Hyperlegible', 'Inter', system-ui, sans-serif; background: var(--fundo); color: var(--texto); line-height: 1.6; padding: 1rem; transition: filter 0.3s ease; touch-action: manipulation; }
+    header { text-align: center; margin-bottom: 2rem; }
+    h1 { font-size: clamp(1.5rem, 5vw, 2.2rem); margin-bottom: 0.5rem; }
+    .subtitle { color: #4B5563; font-size: 1rem; margin-bottom: 1rem; }
+    
+    .tabs { display: flex; gap: 0.5rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap; }
+    .tab-btn { padding: 0.8rem 1.5rem; border: 2px solid var(--azul); background: white; color: var(--azul); cursor: pointer; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
+    .tab-btn.active { background: var(--azul); color: white; }
+    .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    .controls { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin: 1.5rem 0; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .control-group { margin: 0.5rem; }
+    .control-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.3rem; color: #374151; }
+    button { padding: 0.6rem 1rem; border: 2px solid #6B7280; background: var(--branco); cursor: pointer; border-radius: 6px; font-weight: 500; transition: all 0.2s; font-size: 0.9rem; }
+    button:hover { border-color: var(--foco); transform: translateY(-1px); }
+    button:focus-visible, button[aria-pressed="true"] { outline: 3px solid var(--foco); background: #E5E7EB; }
+    
+    .main-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 1200px; margin: 0 auto; }
+    @media(min-width: 968px) { .main-grid { grid-template-columns: 1fr 1fr; } }
+    
+    .wheel-wrapper { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1rem; }
+    .wheel { position: relative; width: 260px; height: 260px; border-radius: 50%; background: conic-gradient(var(--azul) 0deg 72deg, var(--amarelo) 72deg 144deg, var(--vermelho) 144deg 216deg, var(--preto) 216deg 288deg, var(--branco) 288deg 360deg); box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 5px solid #D1D5DB; }
+    .wheel-btn { position: absolute; width: 52px; height: 52px; border: 3px solid var(--texto); background: var(--branco); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; transition: all 0.2s; font-weight: bold; }
+    .wheel-btn:hover { transform: scale(1.2); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .wheel-btn:focus-visible { outline: 4px solid var(--foco); outline-offset: 4px; }
+    .w1 { top: 2%; left: 50%; transform: translate(-50%, -50%); }
+    .w2 { top: 30%; right: 4%; }
+    .w3 { bottom: 10%; right: 15%; }
+    .w4 { bottom: 10%; left: 15%; }
+    .w5 { top: 30%; left: 4%; }
+
+    .secondary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.8rem; width: 100%; max-width: 500px; margin-top: 0.5rem; }
+    .sec-btn { padding: 0.6rem; border: 2px solid #D1D5DB; background: white; border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .sec-btn:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .sec-btn:focus-visible { outline: 3px solid var(--foco); outline-offset: 3px; }
+    .sec-btn.active { background: #E0E7FF; border-color: var(--foco); }
+    .sec-sym { font-size: 1.4rem; font-weight: bold; }
+    .sec-name { font-size: 0.8rem; font-weight: 500; }
+
+    .info-panel, .cdu-panel { background: var(--branco); padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .section-title { font-size: 1.3rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--azul); }
+    .color-info { display: flex; align-items: center; gap: 1rem; margin: 1rem 0; padding: 1rem; background: #F9FAFB; border-radius: 6px; }
+    .symbol-display { font-size: 2.5rem; font-weight: bold; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; background: white; border: 3px solid var(--texto); border-radius: 8px; }
+    
+    .label-preview { margin-top: 1rem; padding: 1.2rem; border: 3px dashed #9CA3AF; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; background: white; border-radius: 6px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+    .audio-toggle { position: fixed; bottom: 20px; right: 20px; background: var(--azul); color: white; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    
+    @media (max-width: 480px) { .wheel { width: 220px; height: 220px; } .wheel-btn { width: 44px; height: 44px; font-size: 1.3rem; } .audio-toggle { bottom: 15px; right: 15px; width: 48px; height: 48px; } }
+    /* ===== CHATBOT ===== */
+    .chat-fab { position: fixed; bottom: 88px; right: 20px; background: var(--sucesso); color: white; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1001; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+    .chat-fab:hover { transform: scale(1.1); }
+    .chat-window { position: fixed; bottom: 160px; right: 20px; width: min(360px, calc(100vw - 40px)); background: white; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index: 1002; display: none; flex-direction: column; max-height: 480px; overflow: hidden; border: 2px solid #E5E7EB; }
+    .chat-window.open { display: flex; animation: slideIn 0.25s ease; }
+    .chat-header { background: var(--sucesso); color: white; padding: 0.9rem 1rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; font-size: 1rem; }
+    .chat-close { background: none; border: none; color: white; font-size: 1.3rem; cursor: pointer; padding: 0; line-height: 1; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.7rem; }
+    .chat-msg { max-width: 85%; padding: 0.65rem 0.9rem; border-radius: 12px; font-size: 0.92rem; line-height: 1.5; }
+    .chat-msg.bot { background: #F3F4F6; color: var(--texto); align-self: flex-start; border-bottom-left-radius: 3px; }
+    .chat-msg.user { background: var(--sucesso); color: white; align-self: flex-end; border-bottom-right-radius: 3px; }
+    .chat-msg.typing { background: #F3F4F6; color: #9CA3AF; font-style: italic; align-self: flex-start; }
+    .chat-input-row { display: flex; gap: 0.5rem; padding: 0.75rem; border-top: 1px solid #E5E7EB; background: #FAFAFA; }
+    .chat-input-row input { flex: 1; padding: 0.6rem 0.8rem; border: 2px solid #D1D5DB; border-radius: 8px; font-size: 0.9rem; outline: none; }
+    .chat-input-row input:focus { border-color: var(--sucesso); }
+    .chat-input-row button { background: var(--sucesso); color: white; border: none; border-radius: 8px; padding: 0.6rem 0.9rem; cursor: pointer; font-size: 1.1rem; }
+    .chat-input-row button:hover { opacity: 0.85; }
+    .chat-suggestions { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 1rem 0.7rem; }
+    .chat-sug { background: #EEF2FF; color: var(--azul); border: 1px solid #C7D2FE; border-radius: 20px; padding: 0.3rem 0.75rem; font-size: 0.8rem; cursor: pointer; }
+    .chat-sug:hover { background: #E0E7FF; }
+
+    @media print { body { background: white; filter: none !important; } header, .tabs, .controls, .wheel-wrapper, button, .audio-toggle, .install-prompt, .chat-fab, .chat-window { display: none !important; } .tab-content { display: block !important; } .info-panel, .cdu-panel { box-shadow: none; border: 2px solid #000; page-break-inside: avoid; } .label-preview { border: 3px solid #000; padding: 1.5rem; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌈 Roda ColorADD + CDU</h1>
+    <p class="subtitle">Alfabeto da cor completo</p>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" data-tab="coloradd">🎨 ColorADD</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="cdu">📚 Classes CDU</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="combinar">🔗 Combinar</button>
+    </div>
+  </header>
+
+  <div id="tab-coloradd" class="tab-content active">
+    <div class="controls" role="group" aria-label="Simulação de visão cromática">
+      <div class="control-group">
+        <span class="control-label">Tipo de Visão:</span>
+        <button aria-pressed="true" data-filter="normal">Visão Típica</button>
+        <button data-filter="protanomaly">Protanomalia</button>
+        <button data-filter="deuteranomaly">Deuteranomalia</button>
+        <button data-filter="tritanomaly">Tritanomalia</button>
+      </div>
+      <div class="control-group">
+        <span class="control-label">Daltonismo:</span>
+        <button data-filter="protanopia">Protanopia</button>
+        <button data-filter="deuteranopia">Deuteranopia</button>
+        <button data-filter="tritanopia">Tritanopia</button>
+        <button data-filter="monochromacy">Monocromacia</button>
+      </div>
+    </div>
+
+    <main class="main-grid">
+      <section class="wheel-wrapper" aria-label="Selecionador de cores ColorADD">
+        <div class="wheel" role="group">
+          <button class="wheel-btn w1" data-color="azul" aria-label="Azul" title="Azul">▲</button>
+          <button class="wheel-btn w2" data-color="amarelo" aria-label="Amarelo" title="Amarelo">◆</button>
+          <button class="wheel-btn w3" data-color="vermelho" aria-label="Vermelho" title="Vermelho">●</button>
+          <button class="wheel-btn w4" data-color="preto" aria-label="Preto" title="Preto">■</button>
+          <button class="wheel-btn w5" data-color="branco" aria-label="Branco" title="Branco">□</button>
+        </div>
+        <div class="secondary-grid" role="group" aria-label="Cores Secundárias">
+          <button class="sec-btn" data-color="verde" aria-label="Verde"><span class="sec-sym">▲◆</span><span class="sec-name">Verde</span></button>
+          <button class="sec-btn" data-color="laranja" aria-label="Laranja"><span class="sec-sym">◆●</span><span class="sec-name">Laranja</span></button>
+          <button class="sec-btn" data-color="roxo" aria-label="Roxo"><span class="sec-sym">▲●</span><span class="sec-name">Roxo</span></button>
+          <button class="sec-btn" data-color="castanho" aria-label="Castanho"><span class="sec-sym">◆■</span><span class="sec-name">Castanho</span></button>
+          <button class="sec-btn" data-color="rosa" aria-label="Rosa"><span class="sec-sym">●□</span><span class="sec-name">Rosa</span></button>
+          <button class="sec-btn" data-color="cinzento" aria-label="Cinzento"><span class="sec-sym">■□</span><span class="sec-name">Cinzento</span></button>
+        </div>
+      </section>
+
+      <section class="info-panel" aria-live="polite">
+        <h2 class="section-title" id="selected-color">Selecione uma cor</h2>
+        <p id="color-desc">Selecione um símbolo primário ou secundário para ver a correspondência e gerar uma etiqueta.</p>
+        <div class="color-info" id="color-info" style="display:none;">
+          <div class="symbol-display" id="symbol-display">▲</div>
+          <div>
+            <strong id="color-name">Azul</strong>
+            <p id="color-details" style="font-size:0.9rem; color:#6B7280;">Triângulo para cima</p>
+          </div>
+        </div>
+        <div class="label-preview" id="label-preview" role="img" aria-label="Pré-visualização da etiqueta">🏷️ Pré-visualização da etiqueta</div>
+        <div style="margin-top:1.5rem; display:grid; grid-template-columns: 1fr; gap:0.8rem;">
+          <label for="book-title" class="sr-only">Título do documento</label>
+          <input type="text" id="book-title" placeholder="Ex: O diário da nossa paixão" style="padding:0.7rem; border:2px solid #9CA3AF; border-radius:6px; font-size:1rem;">
+          <button id="generate" style="background:var(--azul); color:white; border:none; font-size:1rem;">Gerar Etiqueta</button>
+          <button id="print-label" style="background:var(--sucesso); color:white; border:none; font-size:1rem;">🖨️ Imprimir / Guardar PDF</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="tab-cdu" class="tab-content">
+    <section class="cdu-panel">
+      <h2 class="section-title">📚 Classes Principais da CDU</h2>
+      <p style="margin-bottom:1rem; color:#4B5563;">Selecione uma classe CDU para associar a um símbolo ColorADD e gerar etiquetas temáticas para a biblioteca.</p>
+      <div class="cdu-grid" id="cduGrid" role="listbox" aria-label="Classes CDU" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.8rem; margin-top: 1rem;"></div>
+      <div style="margin-top:1.5rem; padding:1rem; background:#F0FDF4; border-radius:6px; border-left:4px solid var(--sucesso);">
+        <strong>💡 Dica:</strong> As cores primárias são ideais para as classes principais. As secundárias funcionam bem para subclasses ou coleções temáticas específicas.
+      </div>
+    </section>
+  </div>
+
+  <div id="tab-combinar" class="tab-content">
+    <main class="main-grid">
+      <section class="info-panel">
+        <h2 class="section-title">🔗 Combinar ColorADD + CDU</h2>
+        <p style="margin-bottom:1rem;">Crie etiquetas completas com símbolo ColorADD e classificação CDU.</p>
+        <div style="display:grid; gap:1rem; margin:1.5rem 0;">
+          <div>
+            <label style="display:block; font-weight:600; margin-bottom:0.5rem;">1. Escolha o símbolo ColorADD:</label>
+            <div id="coloraddSelector" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button data-color="azul" class="coloradd-select" style="padding:0.8rem 1.2rem; font-size:1.5rem;">▲</button>
+              <button data-color="amarelo" class="coloradd-select" style="padding:0.8rem 1.2rem; font-size:1.5rem;">◆</button>
+              <button data-color="vermelho" class="coloradd-select" style="padding:0.8rem 1.2rem; font-size:1.5rem;">●</button>
+              <button data-color="preto" class="coloradd-select" style="padding:0.8rem 1.2rem; font-size:1.5rem;">■</button>
+              <button data-color="branco" class="coloradd-select" style="padding:0.8rem 1.2rem; font-size:1.5rem;">□</button>
+              <button data-color="verde" class="coloradd-select" style="padding:0.8rem 1.2rem; font-size:1.5rem;">▲◆</button>
+              <button data-color="laranja" class="coloradd-select" style="padding:0.8rem 1.2rem; font-size:1.5rem;">◆●</button>
+              <button data-color="roxo" class="coloradd-select" style="padding:0.8rem 1.2rem; font-size:1.5rem;">▲●</button>
+            </div>
+          </div>
+          <div>
+            <label style="display:block; font-weight:600; margin-bottom:0.5rem;">2. Selecione a classe CDU:</label>
+            <select id="cduSelect" style="width:100%; padding:0.7rem; border:2px solid #9CA3AF; border-radius:6px; font-size:1rem;"><option value="">-- Selecione uma classe --</option></select>
+          </div>
+          <div>
+            <label style="display:block; font-weight:600; margin-bottom:0.5rem;">3. Título do documento:</label>
+            <input type="text" id="combinedTitle" placeholder="Ex: A morgadinha dos canaviais" style="width:100%; padding:0.7rem; border:2px solid #9CA3AF; border-radius:6px; font-size:1rem;">
+          </div>
+        </div>
+        <div class="label-preview" id="combinedLabel" style="border-color:var(--azul);"><div style="color:#6B7280; font-style:italic;">Seleciona ColorADD + CDU para ver a etiqueta</div></div>
+        <button id="generateCombined" style="margin-top:1rem; width:100%; padding:0.8rem; background:var(--sucesso); color:white; border:none; font-size:1.1rem; border-radius:6px;">🏷️ Gerar Etiqueta Combinada</button>
+        <button id="printCombined" style="margin-top:0.5rem; width:100%; padding:0.8rem; background:var(--azul); color:white; border:none; font-size:1.1rem; border-radius:6px;">🖨️ Imprimir</button>
+      </section>
+      <section class="cdu-panel">
+        <h3 class="section-title" style="font-size:1.1rem;">📖 Exemplos de Aplicação</h3>
+        <ul style="padding-left:1.2rem; line-height:1.8;">
+          <li><strong>0</strong> + □ = Generalidades / Novidades</li>
+          <li><strong>3</strong> + ● = Ciências Sociais / Direito</li>
+          <li><strong>5</strong> + ▲ = Matemática / Ciências Puras</li>
+          <li><strong>7</strong> + ◆ = Arte / Desporto / Cultura</li>
+          <li><strong>8</strong> + ● = Literatura / Línguas</li>
+          <li><strong>9</strong> + ▲ = História / Geografia / Biografia</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <button class="audio-toggle" id="audioToggle" aria-label="Ativar/desativar som" title="Ativar/desativar som">🔊</button>
+  <!-- ===== CHATBOT ===== -->
+  <button class="chat-fab" id="chatFab" aria-label="Abrir assistente" title="Assistente ColorADD+CDU">💬</button>
+  <div class="chat-window" id="chatWindow" role="dialog" aria-label="Assistente ColorADD+CDU">
+    <div class="chat-header">
+      🎨 Assistente ColorADD+CDU
+      <button class="chat-close" id="chatClose" aria-label="Fechar chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg bot">Olá! Sou o assistente da Roda ColorADD+CDU. Posso ajudar com símbolos de cor, classes CDU, acessibilidade cromática e etiquetagem de documentos. Como posso ajudar?</div>
+    </div>
+    <div class="chat-suggestions" id="chatSuggestions">
+      <button class="chat-sug" data-q="O que é o ColorADD?">O que é o ColorADD?</button>
+      <button class="chat-sug" data-q="Como funciona a CDU?">Como funciona a CDU?</button>
+      <button class="chat-sug" data-q="Que cor usar para Literatura?">Cor para Literatura?</button>
+      <button class="chat-sug" data-q="O que é daltonismo?">O que é daltonismo?</button>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Escreve a tua pergunta..." aria-label="Pergunta ao assistente" maxlength="300">
+      <button id="chatSend" aria-label="Enviar">➤</button>
+    </div>
+  </div>
+
+  <script>
+    // ==================== DATA ====================
+    const coloraddData = {
+      azul: { symbol: '▲', name: 'Azul', type: 'primaria', hex: '#2563EB', details: 'Triângulo para cima. Ciências, tecnologia, história.', freq: 261.63 },
+      amarelo: { symbol: '◆', name: 'Amarelo', type: 'primaria', hex: '#F59E0B', details: 'Losango. Filosofia, religião, arte.', freq: 329.63 },
+      vermelho: { symbol: '●', name: 'Vermelho', type: 'primaria', hex: '#DC2626', details: 'Círculo. Ciências sociais, literatura.', freq: 392.00 },
+      preto: { symbol: '■', name: 'Preto', type: 'primaria', hex: '#111827', details: 'Quadrado preenchido. Referência, manuais.', freq: 196.00 },
+      branco: { symbol: '□', name: 'Branco', type: 'primaria', hex: '#F9FAFB', details: 'Quadrado vazio. Generalidades, novidades.', freq: 523.25 },
+      verde: { symbol: '▲◆', name: 'Verde', type: 'secundaria', hex: '#10B981', details: 'Azul + Amarelo. Ecopontos, natureza, saúde.', freq: [261.63, 329.63] },
+      laranja: { symbol: '◆●', name: 'Laranja', type: 'secundaria', hex: '#F97316', details: 'Amarelo + Vermelho. Energia, criatividade, infância.', freq: [329.63, 392.00] },
+      roxo: { symbol: '▲●', name: 'Roxo', type: 'secundaria', hex: '#8B5CF6', details: 'Azul + Vermelho. Fantasia, espiritualidade, poesia.', freq: [261.63, 392.00] },
+      castanho: { symbol: '◆■', name: 'Castanho', type: 'secundaria', hex: '#92400E', details: 'Amarelo + Preto. Terra, arquivo, documentos históricos.', freq: [329.63, 196.00] },
+      rosa: { symbol: '●□', name: 'Rosa', type: 'secundaria', hex: '#EC4899', details: 'Vermelho + Branco. Romance, infância, suavidade.', freq: [392.00, 523.25] },
+      cinzento: { symbol: '■□', name: 'Cinzento', type: 'secundaria', hex: '#6B7280', details: 'Preto + Branco. Neutralidade, transição, notas de rodapé.', freq: [196.00, 523.25] }
+    };
+
+    const cduClasses = [
+      { number: '0', theme: 'Generalidades. Ciência e conhecimento', color: '#8B5CF6', sug: 'branco' },
+      { number: '1', theme: 'Filosofia. Psicologia', color: '#EC4899', sug: 'amarelo' },
+      { number: '2', theme: 'Religião. Teologia', color: '#F59E0B', sug: 'amarelo' },
+      { number: '3', theme: 'Ciências sociais. Política. Economia. Direito', color: '#10B981', sug: 'verde' },
+      { number: '5', theme: 'Matemática. Ciências naturais', color: '#10B981', sug: 'azul' },
+      { number: '6', theme: 'Ciências aplicadas. Medicina. Tecnologia', color: '#3B82F6', sug: 'azul' },
+      { number: '7', theme: 'Arte. Arquitetura. Jogos. Desporto', color: '#2563EB', sug: 'azul' },
+      { number: '8', theme: 'Língua. Linguística. Literatura', color: '#F59E0B', sug: 'amarelo' },
+      { number: '9', theme: 'Geografia. Biografia. História', color: '#DC2626', sug: 'vermelho' }
+    ];
+
+    // ==================== AUDIO ====================
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    let audioEnabled = localStorage.getItem('coloradd_audio_enabled') === 'true';
+    const audioToggle = document.getElementById('audioToggle');
+    audioToggle.textContent = audioEnabled ? '🔊' : '🔇';
+    audioToggle.setAttribute('aria-label', audioEnabled ? 'Desativar som' : 'Ativar som');
+
+    function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+    function playTone(freq, dur = 0.15, type = 'sine') { if (!audioEnabled || !audioCtx) return; const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value = freq; osc.type = type; gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur); osc.start(); osc.stop(audioCtx.currentTime + dur); }
+    function playColorSound(key) { if (!audioEnabled) return; initAudio(); const d = coloraddData[key]; if (Array.isArray(d.freq)) { setTimeout(() => playTone(d.freq[0]), 0); setTimeout(() => playTone(d.freq[1]), 150); } else playTone(d.freq); }
+    function playClickSound() { if (audioEnabled) playTone(800, 0.05, 'triangle'); }
+    function playSuccessSound() { if (!audioEnabled) return; setTimeout(() => playTone(523.25, 0.1), 0); setTimeout(() => playTone(659.25, 0.1), 100); setTimeout(() => playTone(783.99, 0.15), 200); }
+
+    audioToggle.addEventListener('click', () => { audioEnabled = !audioEnabled; audioToggle.textContent = audioEnabled ? '🔊' : '🔇'; audioToggle.setAttribute('aria-label', audioEnabled ? 'Desativar som' : 'Ativar som'); if (audioEnabled) { initAudio(); playSuccessSound(); } localStorage.setItem('coloradd_audio_enabled', audioEnabled); });
+
+    // ==================== UI LOGIC ====================
+    const filters = { normal: 'none', protanomaly: 'url(#protanomaly)', deuteranomaly: 'url(#deuteranomaly)', tritanomaly: 'url(#tritanomaly)', protanopia: 'url(#protanopia)', deuteranopia: 'url(#deuteranopia)', tritanopia: 'url(#tritanopia)', monochromacy: 'grayscale(100%)' };
+    let currentColor = null;
+
+    function updateUI(key) {
+      currentColor = key;
+      const d = coloraddData[key];
+      document.getElementById('selected-color').textContent = `${d.symbol} ${d.name}`;
+      document.getElementById('color-desc').textContent = d.details;
+      const info = document.getElementById('color-info'); info.style.display = 'flex';
+      document.getElementById('symbol-display').textContent = d.symbol;
+      document.getElementById('symbol-display').style.borderColor = d.hex;
+      document.getElementById('color-name').textContent = d.name;
+      document.getElementById('color-details').textContent = `${d.type === 'secundaria' ? 'Cor secundária: ' + d.details : d.details}`;
+      document.getElementById('label-preview').innerHTML = `<span style="font-size:2.2rem; margin-right:0.6rem; color:${d.hex};">${d.symbol}</span> <span style="font-size:1.2rem;">${document.getElementById('book-title').value || 'Título do recurso'}</span>`;
+      
+      document.querySelectorAll('.wheel-btn, .sec-btn').forEach(b => b.setAttribute('aria-pressed', b.dataset.color === key));
+      playColorSound(key);
+      if (navigator.vibrate) navigator.vibrate(50);
+    }
+
+    document.querySelectorAll('.wheel-btn, .sec-btn').forEach(btn => {
+      btn.addEventListener('click', () => updateUI(btn.dataset.color));
+      btn.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); updateUI(btn.dataset.color); } });
+    });
+
+    document.querySelectorAll('.controls button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClickSound();
+        document.querySelectorAll('.controls button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        document.body.style.filter = filters[btn.dataset.filter] || 'none';
+      });
+    });
+
+    document.getElementById('generate').addEventListener('click', () => { playClickSound(); if(currentColor) updateUI(currentColor); playSuccessSound(); });
+    document.getElementById('print-label').addEventListener('click', () => { playClickSound(); window.print(); });
+
+    // CDU Tab
+    function renderCDUGrid() {
+      const grid = document.getElementById('cduGrid');
+      const select = document.getElementById('cduSelect');
+      cduClasses.forEach(c => {
+        const div = document.createElement('div');
+        const bg = c.bgColor || '#F9FAFB';
+        const textColor = c.bgColor ? c.color : '#374151';
+        const numColor = c.bgColor ? c.color : '#111827';
+        div.style.cssText = `padding:0.8rem; border-left:4px solid ${c.color}; background:${bg}; border-radius:6px; cursor:pointer; transition:0.2s;`;
+        div.innerHTML = `<div style="font-weight:bold; font-size:1.1rem; color:${numColor};">${c.number}</div><div style="font-size:0.95rem; color:${textColor};">${c.theme}</div><div style="font-size:0.8rem; color:${c.bgColor ? c.color : '#6B7280'}; margin-top:0.3rem;">Sugerido: ${coloraddData[c.sug].symbol} ${coloraddData[c.sug].name}</div>`;
+        div.addEventListener('click', () => { grid.querySelectorAll('div').forEach(d=>d.style.background='#F9FAFB'); div.style.background='#E0E7FF'; select.value = c.number; playClickSound(); });
+        grid.appendChild(div);
+        const opt = document.createElement('option'); opt.value = c.number; opt.textContent = `${c.number} - ${c.theme}`; select.appendChild(opt);
+      });
+    }
+
+    // Combinar Tab
+    let selColor = null, selCDU = null;
+    document.querySelectorAll('.coloradd-select').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.coloradd-select').forEach(x=>x.style.background='white'); b.style.background='var(--azul)'; b.style.color='white'; selColor = b.dataset.color; playClickSound(); updateCombined(); }));
+    document.getElementById('cduSelect').addEventListener('change', e => { selCDU = e.target.value; playClickSound(); updateCombined(); });
+    document.getElementById('combinedTitle').addEventListener('input', updateCombined);
+    function updateCombined() { if(!selColor || !selCDU) return; const d = coloraddData[selColor], c = cduClasses.find(x=>x.number===selCDU), t = document.getElementById('combinedTitle').value || 'Título'; document.getElementById('combinedLabel').innerHTML = `<div style="font-size:0.9rem; color:#6B7280; font-style:italic;">CDU ${c.number} | ${c.theme.split('.')[0]}</div><div style="font-size:2rem; margin:0.5rem 0; color:${d.hex};">${d.symbol}</div><div style="font-size:1.2rem;">${t}</div>`; }
+    document.getElementById('generateCombined').addEventListener('click', () => { if(!selColor||!selCDU) alert('Selecione símbolo e CDU!'); else { playSuccessSound(); updateCombined(); } });
+    document.getElementById('printCombined').addEventListener('click', () => { playClickSound(); window.print(); });
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false');}); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); btn.setAttribute('aria-selected','true'); document.getElementById('tab-'+btn.dataset.tab).classList.add('active'); playClickSound(); }));
+
+    // SVG Filters
+    document.body.insertAdjacentHTML('beforeend', `<svg style="display:none" aria-hidden="true"><defs><filter id="protanomaly"><feColorMatrix type="matrix" values="0.8 0.2 0 0 0 0.2 0.7 0.1 0 0 0 0.1 0.9 0 0 0 0 0 1 0"/></filter><filter id="deuteranomaly"><feColorMatrix type="matrix" values="0.8 0.2 0 0 0 0.3 0.6 0.1 0 0 0 0.2 0.8 0 0 0 0 0 1 0"/></filter><filter id="tritanomaly"><feColorMatrix type="matrix" values="0.9 0.1 0 0 0 0 0.8 0.2 0 0 0.1 0.2 0.7 0 0 0 0 0 1 0"/></filter><filter id="protanopia"><feColorMatrix type="matrix" values="0.567 0.433 0 0 0 0.558 0.442 0 0 0 0 0.242 0.758 0 0 0 0 0 1 0"/></filter><filter id="deuteranopia"><feColorMatrix type="matrix" values="0.625 0.375 0 0 0 0.7 0.3 0 0 0 0 0.3 0.7 0 0 0 0 0 1 0"/></filter><filter id="tritanopia"><feColorMatrix type="matrix" values="0.95 0.05 0 0 0 0 0.433 0.567 0 0 0 0.475 0.525 0 0 0 0 0 1 0"/></filter></defs></svg>`);
+
+    renderCDUGrid(); updateUI('azul');
+
+    // ==================== CHATBOT OFFLINE RICO ====================
+    const chatFab = document.getElementById('chatFab');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatClose = document.getElementById('chatClose');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+
+    // ---- BASE DE CONHECIMENTO ----
+    const KB = [
+
+      // === SAUDAÇÕES ===
+      {
+        keys: ['ola','olá','bom dia','boa tarde','boa noite','hello','hi','hey','olá','boas'],
+        resp: 'Olá! 👋 Bem-vindo ao assistente da Roda ColorADD+CDU!\nPosso ajudar-te com:\n• Símbolos e cores do sistema ColorADD\n• Classes da CDU e cores associadas\n• Daltonismo e acessibilidade cromática\n• Como gerar e imprimir etiquetas\n• Instalar a app offline\nO que precisas?'
+      },
+
+      // === AJUDA GERAL ===
+      {
+        keys: ['ajuda','help','o que sabes','o que podes','funcionalidades','o que fazes','para que serves'],
+        resp: 'Posso responder a perguntas sobre:\n\n🎨 ColorADD — símbolos, cores primárias e secundárias, como combinar\n📚 CDU — todas as classes, cores associadas, como classificar documentos\n👁️ Daltonismo — tipos, simulações disponíveis na app\n🏷️ Etiquetas — como gerar, combinar e imprimir\n📱 App offline — como instalar a PWA\n\nEscreve a tua pergunta!'
+      },
+
+      // === O QUE É O COLORADD ===
+      {
+        keys: ['coloradd','o que é o coloradd','sistema coloradd','como funciona o coloradd','alfabeto da cor','cor para todos','miguel neiva','inventou','criou','origem','historia do coloradd','historia','criação'],
+        resp: 'O ColorADD é um sistema de símbolos criado pelo designer português Miguel Neiva, desenvolvido na Universidade do Minho. Foi concebido para tornar a identificação das cores universal e inclusiva, especialmente para pessoas com daltonismo.\n\nBaseia-se em 5 símbolos geométricos simples — as cores primárias:\n  ▲ = Azul\n  ◆ = Amarelo\n  ● = Vermelho\n  ■ = Preto\n  □ = Branco\n\nAs cores secundárias resultam da combinação visual desses símbolos, tal como as cores resultam da mistura de pigmentos. É usado em hospitais, transportes públicos, supermercados, escolas e bibliotecas em Portugal e no mundo.'
+      },
+
+      // === SÍMBOLOS PRIMÁRIOS ===
+      {
+        keys: ['primaria','primárias','cores primarias','cores primárias','quais são as primárias','primarios','simbolos primarios','símbolos primários'],
+        resp: 'As 5 cores primárias do ColorADD e os seus símbolos são:\n\n  ▲ (triângulo para cima) = Azul\n  ◆ (losango) = Amarelo\n  ● (círculo) = Vermelho\n  ■ (quadrado preenchido) = Preto\n  □ (quadrado vazio) = Branco\n\nEstes 5 símbolos são a base de todo o sistema. Combinando-os obtemos as cores secundárias.'
+      },
+
+      // === SÍMBOLOS SECUNDÁRIOS ===
+      {
+        keys: ['secundaria','secundárias','cores secundarias','cores secundárias','combinacao','combinação','mistura','quais são as secundárias','simbolos secundarios','símbolos secundários'],
+        resp: 'As cores secundárias do ColorADD resultam da combinação dos símbolos primários:\n\n  ▲◆ = Verde (Azul + Amarelo)\n  ◆● = Laranja (Amarelo + Vermelho)\n  ▲● = Roxo (Azul + Vermelho)\n  ◆■ = Castanho (Amarelo + Preto)\n  ●□ = Rosa (Vermelho + Branco)\n  ■□ = Cinzento (Preto + Branco)\n\nA lógica é a mesma da mistura de pigmentos — muito intuitiva!'
+      },
+
+      // === AZUL ===
+      {
+        keys: ['azul','triangulo','triângulo','▲','cor azul'],
+        resp: 'Azul no ColorADD:\n  Símbolo: ▲ (triângulo para cima)\n  Tipo: Cor primária\n  Nota musical associada: Dó (261,63 Hz)\n\nNa CDU, o azul está associado às classes:\n  • 6 — Ciências Aplicadas / Medicina / Tecnologia\n  • 7 — Arte / Arquitetura / Desporto\n\nO azul é também componente de:\n  ▲◆ = Verde\n  ▲● = Roxo'
+      },
+
+      // === AMARELO ===
+      {
+        keys: ['amarelo','losango','◆','cor amarelo'],
+        resp: 'Amarelo no ColorADD:\n  Símbolo: ◆ (losango)\n  Tipo: Cor primária\n  Nota musical associada: Mi (329,63 Hz)\n\nNa CDU, o amarelo está associado às classes:\n  • 1 — Filosofia / Psicologia\n  • 2 — Religião / Teologia\n  • 8 — Língua / Literatura (◆)\n\nO amarelo é também componente de:\n  ▲◆ = Verde\n  ◆● = Laranja\n  ◆■ = Castanho'
+      },
+
+      // === VERMELHO ===
+      {
+        keys: ['vermelho','circulo','círculo','●','cor vermelho'],
+        resp: 'Vermelho no ColorADD:\n  Símbolo: ● (círculo)\n  Tipo: Cor primária\n  Nota musical associada: Sol (392,00 Hz)\n\nNa CDU, o vermelho está associado à classe:\n  • 9 — História / Geografia / Biografia\n\nO vermelho é também componente de:\n  ◆● = Laranja\n  ▲● = Roxo\n  ●□ = Rosa'
+      },
+
+      // === PRETO ===
+      {
+        keys: ['preto','quadrado preenchido','■','cor preto'],
+        resp: 'Preto no ColorADD:\n  Símbolo: ■ (quadrado preenchido)\n  Tipo: Cor primária\n  Nota musical associada: Sol (196,00 Hz)\n\nO preto é componente de:\n  ◆■ = Castanho\n  ■□ = Cinzento\n\nNa CDU, o quadrado ■ está associado a referências e manuais (classe 0 junto com □).'
+      },
+
+      // === BRANCO ===
+      {
+        keys: ['branco','quadrado vazio','□','cor branco'],
+        resp: 'Branco no ColorADD:\n  Símbolo: □ (quadrado vazio)\n  Tipo: Cor primária\n  Nota musical associada: Dó (523,25 Hz)\n\nNa CDU, o branco (□) está associado à classe:\n  • 0 — Generalidades / Ciência e Conhecimento\n\nO branco é também componente de:\n  ●□ = Rosa\n  ■□ = Cinzento'
+      },
+
+      // === VERDE ===
+      {
+        keys: ['verde','▲◆','cor verde'],
+        resp: 'Verde no ColorADD:\n  Símbolo: ▲◆ (triângulo + losango)\n  Tipo: Cor secundária = Azul + Amarelo\n  Notas musicais: Dó + Mi\n\nNa CDU, o verde está associado à classe:\n  • 3 — Ciências Sociais / Política / Economia / Direito\n\nO verde não existe como símbolo primário — resulta sempre da combinação ▲◆.'
+      },
+
+      // === LARANJA ===
+      {
+        keys: ['laranja','◆●','cor laranja'],
+        resp: 'Laranja no ColorADD:\n  Símbolo: ◆● (losango + círculo)\n  Tipo: Cor secundária = Amarelo + Vermelho\n  Notas musicais: Mi + Sol\n\nAssociações temáticas: energia, criatividade, infância.\nNão está diretamente mapeado a uma classe CDU principal, mas pode ser usado para subclasses temáticas.'
+      },
+
+      // === ROXO ===
+      {
+        keys: ['roxo','violeta','▲●','cor roxo','cor violeta'],
+        resp: 'Roxo no ColorADD:\n  Símbolo: ▲● (triângulo + círculo)\n  Tipo: Cor secundária = Azul + Vermelho\n  Notas musicais: Dó + Sol\n\nAssociações temáticas: fantasia, espiritualidade, poesia.\nIdeal para colecções de poesia ou literatura fantástica dentro da classe 8.'
+      },
+
+      // === CASTANHO ===
+      {
+        keys: ['castanho','marrom','◆■','cor castanho'],
+        resp: 'Castanho no ColorADD:\n  Símbolo: ◆■ (losango + quadrado preenchido)\n  Tipo: Cor secundária = Amarelo + Preto\n  Notas musicais: Mi + Sol\n\nAssociações temáticas: terra, arquivo, documentos históricos.\nAdequado para fundo de arquivo ou colecções históricas especiais.'
+      },
+
+      // === ROSA ===
+      {
+        keys: ['rosa','●□','cor rosa','pink'],
+        resp: 'Rosa no ColorADD:\n  Símbolo: ●□ (círculo + quadrado vazio)\n  Tipo: Cor secundária = Vermelho + Branco\n  Notas musicais: Sol + Dó\n\nAssociações temáticas: romance, infância, suavidade.\nIdeal para colecções infantis ou literatura romântica dentro da classe 8.'
+      },
+
+      // === CINZENTO ===
+      {
+        keys: ['cinzento','cinza','■□','cor cinzento','cor cinza'],
+        resp: 'Cinzento no ColorADD:\n  Símbolo: ■□ (quadrado preenchido + quadrado vazio)\n  Tipo: Cor secundária = Preto + Branco\n  Notas musicais: Sol + Dó\n\nAssociações temáticas: neutralidade, transição, notas de rodapé.\nAdequado para documentos de referência ou fundo de acervo especial.'
+      },
+
+      // === CDU GERAL ===
+      {
+        keys: ['cdu','classificacao decimal','classificação decimal','universal','o que é a cdu','como funciona a cdu','sistema cdu','classes cdu','todas as classes'],
+        resp: 'A CDU (Classificação Decimal Universal) é um sistema internacional de organização do conhecimento usado em bibliotecas. Divide o saber em 10 classes principais:\n\n  0 — Generalidades / Ciência e Conhecimento → □ (Branco)\n  1 — Filosofia / Psicologia → ◆ (Amarelo)\n  2 — Religião / Teologia → ◆ (Amarelo)\n  3 — Ciências Sociais / Política / Economia → ▲◆ (Verde)\n  4 — (classe vaga — Linguística migrou para 8)\n  5 — Matemática / Ciências Naturais → ▲ (Azul)\n  6 — Ciências Aplicadas / Medicina / Tecnologia → ▲ (Azul)\n  7 — Arte / Arquitetura / Desporto → ▲ (Azul)\n  8 — Língua / Literatura → ◆ (Amarelo)\n  9 — História / Geografia / Biografia → ● (Vermelho)\n\nCada classe tem uma cor e símbolo ColorADD associado para etiquetagem inclusiva.'
+      },
+
+      // === CLASSE 0 ===
+      {
+        keys: ['classe 0','generalidades','ciencia e conhecimento','ciência e conhecimento','classe zero'],
+        resp: 'CDU Classe 0 — Generalidades / Ciência e Conhecimento\n\n  Símbolo ColorADD: □ (Branco)\n  Inclui: enciclopédias, jornais, revistas, ciência da informação, biblioteconomia, informática geral, obras de referência.\n\nO □ (Branco) simboliza o vazio que acolhe tudo — adequado para obras de carácter geral que não cabem noutras classes.'
+      },
+
+      // === CLASSE 1 ===
+      {
+        keys: ['classe 1','filosofia','psicologia','classe um','classe 1'],
+        resp: 'CDU Classe 1 — Filosofia / Psicologia\n\n  Símbolo ColorADD: ◆ (Amarelo)\n  Inclui: filosofia ocidental e oriental, ética, lógica, metafísica, psicologia clínica, psicologia social, psicanálise, desenvolvimento humano.'
+      },
+
+      // === CLASSE 2 ===
+      {
+        keys: ['classe 2','religiao','religião','teologia','classe dois','classe 2'],
+        resp: 'CDU Classe 2 — Religião / Teologia\n\n  Símbolo ColorADD: ◆ (Amarelo)\n  Inclui: cristianismo, islamismo, judaísmo, budismo, hinduísmo, religiões comparadas, mitologia, espiritualidade.'
+      },
+
+      // === CLASSE 3 ===
+      {
+        keys: ['classe 3','ciencias sociais','ciências sociais','politica','política','economia','direito','sociologia','classe tres','classe 3'],
+        resp: 'CDU Classe 3 — Ciências Sociais / Política / Economia / Direito\n\n  Símbolo ColorADD: ▲◆ (Verde = Azul + Amarelo)\n  Inclui: sociologia, estatística, ciências políticas, economia, direito, serviço social, educação, etnologia, folclore, costumes.\n\nO verde ▲◆ foi escolhido por evocar crescimento, sociedade e natureza humana.'
+      },
+
+      // === CLASSE 5 ===
+      {
+        keys: ['classe 5','matematica','matemática','ciencias naturais','ciências naturais','fisica','física','quimica','química','biologia','classe cinco','classe 5'],
+        resp: 'CDU Classe 5 — Matemática / Ciências Naturais\n\n  Símbolo ColorADD: ▲ (Azul)\n  Inclui: matemática pura e aplicada, astronomia, física, química, biologia, botânica, zoologia, geologia, paleontologia.'
+      },
+
+      // === CLASSE 6 ===
+      {
+        keys: ['classe 6','ciencias aplicadas','ciências aplicadas','medicina','tecnologia','engenharia','classe seis','classe 6'],
+        resp: 'CDU Classe 6 — Ciências Aplicadas / Medicina / Tecnologia\n\n  Símbolo ColorADD: ▲ (Azul)\n  Inclui: medicina, farmácia, engenharia, arquitectura, agricultura, gestão empresarial, indústria, transportes, tecnologias de informação.'
+      },
+
+      // === CLASSE 7 ===
+      {
+        keys: ['classe 7','arte','artes','arquitetura','arquitectura','desporto','jogos','musica','música','cinema','teatro','dança','danca','classe sete','classe 7'],
+        resp: 'CDU Classe 7 — Arte / Arquitetura / Jogos / Desporto\n\n  Símbolo ColorADD: ▲ (Azul)\n  Inclui: belas artes, arquitetura, escultura, pintura, desenho, fotografia, cinema, teatro, dança, música, jogos, desporto, recreação.\n\nO azul ▲ evoca criatividade, profundidade e expressão artística.'
+      },
+
+      // === CLASSE 8 ===
+      {
+        keys: ['classe 8','lingua','língua','linguistica','linguística','literatura','letras','poesia','romance','ficção','ficcao','classe oito','classe 8'],
+        resp: 'CDU Classe 8 — Língua / Linguística / Literatura\n\n  Símbolo ColorADD: ◆ (Amarelo)\n  Inclui: linguística geral, gramáticas, dicionários, literatura portuguesa, literaturas em língua portuguesa, literaturas estrangeiras, poesia, prosa, teatro, ensaio.\n\nO amarelo ◆ evoca luz, clareza e a luminosidade da palavra escrita.'
+      },
+
+      // === CLASSE 9 ===
+      {
+        keys: ['classe 9','historia','história','geografia','biografia','arqueologia','classe nove','classe 9'],
+        resp: 'CDU Classe 9 — Geografia / Biografia / História\n\n  Símbolo ColorADD: ● (Vermelho)\n  Inclui: arqueologia, história geral e por épocas, história de Portugal, história universal, geografia física e humana, viagens, biografias, genealogia.\n\nO vermelho ● evoca paixão, sangue, memória e o peso da história humana.'
+      },
+
+      // === DALTONISMO GERAL ===
+      {
+        keys: ['daltonismo','daltónico','daltonico','visao das cores','visão das cores','deficiencia de cor','deficiência de cor','cegueira de cor','cegueira das cores'],
+        resp: 'O daltonismo (ou discromatopsia) é uma condição que afeta a percepção das cores, mais comum em homens. Existem vários tipos:\n\n👁️ Tipos por cor afectada:\n  • Protanopia/Protanomalia — dificuldade com o vermelho (1% dos homens)\n  • Deuteranopia/Deuteranomalia — dificuldade com o verde (5% dos homens)\n  • Tritanopia/Tritanomalia — dificuldade com o azul (raro)\n  • Monocromacia — visão a preto e branco (muito raro)\n\nO ColorADD foi criado precisamente para que pessoas com daltonismo possam identificar cores através de símbolos, sem depender da percepção cromática.\n\nNa app, podes simular cada tipo de visão no separador ColorADD!'
+      },
+
+      // === TIPOS ESPECÍFICOS DE DALTONISMO ===
+      {
+        keys: ['protanopia','protanomalia','vermelho dificuldade','nao ve vermelho','não vê vermelho'],
+        resp: 'Protanopia / Protanomalia\n\nAfecta a percepção do vermelho. Quem tem protanopia não distingue bem vermelho de verde e vê o vermelho muito escurecido ou quase preto.\n\nEstima-se que afecte cerca de 1% dos homens.\n\nNa app, clica em "Protanopia" ou "Protanomalia" no separador ColorADD para simular esta visão.'
+      },
+      {
+        keys: ['deuteranopia','deuteranomalia','verde dificuldade','nao ve verde','não vê verde'],
+        resp: 'Deuteranopia / Deuteranomalia\n\nÉ o tipo de daltonismo mais comum — afecta cerca de 5% dos homens. Quem tem deuteranopia tem dificuldade em distinguir vermelho de verde. O mundo parece dominado por tons de amarelo e azul.\n\nNa app, clica em "Deuteranopia" ou "Deuteranomalia" para simular esta visão.'
+      },
+      {
+        keys: ['tritanopia','tritanomalia','azul dificuldade','nao ve azul','não vê azul'],
+        resp: 'Tritanopia / Tritanomalia\n\nAfecta a percepção do azul e amarelo. É o tipo mais raro de daltonismo, afectando menos de 0,01% da população. Quem tem tritanopia confunde azul com verde e amarelo com violeta.\n\nNa app, clica em "Tritanopia" ou "Tritanomalia" para simular.'
+      },
+      {
+        keys: ['monocromacia','monocromatismo','preto e branco','visao preto','visão preto','acromatopsia'],
+        resp: 'Monocromacia / Acromatopsia\n\nÉ a forma mais rara e severa — a pessoa vê tudo em tons de cinzento, sem percepção de qualquer cor. Afecta menos de 0,003% da população.\n\nNa app, clica em "Monocromacia" para ver como o mundo parece a quem tem esta condição.'
+      },
+
+      // === SIMULAÇÕES ===
+      {
+        keys: ['simulacao','simulação','simular','tipo de visao','tipo de visão','filtro','como simular'],
+        resp: 'A app tem um simulador de visão cromática no separador ColorADD!\n\nPodes simular:\n  • Visão Típica (normal)\n  • Protanomalia e Protanopia (vermelho)\n  • Deuteranomalia e Deuteranopia (verde)\n  • Tritanomalia e Tritanopia (azul)\n  • Monocromacia (preto e branco)\n\nClica no botão correspondente e toda a interface muda para mostrares como ficaria para cada tipo de utilizador. Excelente para testar acessibilidade!'
+      },
+
+      // === ETIQUETAS ===
+      {
+        keys: ['etiqueta','etiquetas','gerar etiqueta','gerar','como gerar','criar etiqueta','criar etiquetas','label','rotulo','rótulo'],
+        resp: 'Para gerar etiquetas nesta app tens duas formas:\n\n🎨 Etiqueta ColorADD (separador ColorADD):\n  1. Clica num símbolo de cor\n  2. Escreve o título do documento\n  3. Clica "Gerar Etiqueta"\n  4. Clica "Imprimir / Guardar PDF"\n\n🔗 Etiqueta Combinada (separador Combinar):\n  1. Escolhe o símbolo ColorADD\n  2. Seleciona a classe CDU\n  3. Escreve o título\n  4. Clica "Gerar Etiqueta Combinada"\n  5. Clica "Imprimir"\n\nAs etiquetas combinadas são as mais completas para uma biblioteca!'
+      },
+
+      // === IMPRIMIR ===
+      {
+        keys: ['imprimir','imprimir etiqueta','guardar pdf','pdf','como imprimir','print'],
+        resp: 'Para imprimir ou guardar em PDF:\n\n1. Gera a etiqueta (ColorADD ou Combinada)\n2. Clica no botão "🖨️ Imprimir / Guardar PDF"\n3. Na janela de impressão do browser escolhe:\n   • Uma impressora física → para papel\n   • "Guardar como PDF" → para ficheiro digital\n\nDica: o modo de impressão da app oculta automaticamente todos os controlos e botões, mostrando só a etiqueta limpa!'
+      },
+
+      // === COMBINAR COLORADD + CDU ===
+      {
+        keys: ['combinar','combinacao coloradd cdu','combinação coloradd cdu','juntar','separador combinar','aba combinar'],
+        resp: 'O separador "🔗 Combinar" permite criar etiquetas completas com:\n  • Símbolo ColorADD (a cor)\n  • Classe CDU (a temática)\n  • Título do documento\n\nExemplos de combinações:\n  □ + CDU 0 = Generalidades\n  ◆ + CDU 1 = Filosofia\n  ▲◆ + CDU 3 = Ciências Sociais\n  ▲ + CDU 7 = Arte / Desporto\n  ◆ + CDU 8 = Língua / Literatura\n  ● + CDU 9 = História\n\nEsta combinação é o que torna a etiquetagem verdadeiramente inclusiva e universal!'
+      },
+
+      // === PWA / INSTALAR ===
+      {
+        keys: ['pwa','instalar','instalar app','aplicacao','aplicação','offline','ecrã inicial','ecra inicial','adicionar'],
+        resp: 'Esta ferramenta é uma PWA (Progressive Web App) — podes instalá-la no teu dispositivo e usá-la sem internet!\n\nComo instalar:\n  📱 Mobile (Android): Menu do Chrome → "Adicionar ao ecrã inicial"\n  🍎 iPhone/iPad: Safari → Partilhar → "Adicionar ao ecrã principal"\n  💻 Desktop: Barra de endereço do Chrome → ícone de instalação\n\nApós instalar, aparece como uma app normal no teu dispositivo e funciona completamente offline!'
+      },
+
+      // === SOM / ÁUDIO ===
+      {
+        keys: ['som','audio','áudio','ativar som','desativar som','sons','musica','música','frequencia','frequência','nota musical'],
+        resp: 'A app tem um sistema de som multissensorial! Cada cor tem uma frequência musical associada:\n\n  ▲ Azul = Dó (261,63 Hz)\n  ◆ Amarelo = Mi (329,63 Hz)\n  ● Vermelho = Sol (392,00 Hz)\n  ■ Preto = Sol (196,00 Hz)\n  □ Branco = Dó (523,25 Hz)\n\nAs cores secundárias tocam os dois sons em sequência.\n\nO botão 🔊/🔇 no canto inferior direito ativa/desativa o som. É mais uma forma de tornar a experiência acessível e multissensorial!'
+      },
+
+      // === ACESSIBILIDADE ===
+      {
+        keys: ['acessibilidade','acessivel','acessível','wcag','inclusao','inclusão','inclusivo','deficiencia visual','deficiência visual','para todos','universal'],
+        resp: 'A Roda ColorADD+CDU foi concebida com acessibilidade no centro:\n\n♿ Funcionalidades de acessibilidade:\n  • Simulador de daltonismo (7 tipos de visão)\n  • Símbolos geométricos que não dependem da cor\n  • Sons associados a cada cor (experiência multissensorial)\n  • Vibração no mobile ao selecionar uma cor\n  • Compatível com leitores de ecrã (aria-labels)\n  • Navegação por teclado (teclas Enter e Espaço)\n  • Contraste WCAG 2.1 AA\n  • Fonte Atkinson Hyperlegible (desenhada para baixa visão)\n  • Funciona offline (PWA)'
+      },
+
+      // === BIBLIOTECA / USO EM BIBLIOTECA ===
+      {
+        keys: ['biblioteca','bibliotecas','como usar na biblioteca','etiquetagem','catalogacao','catalogação','classificar livros','classificar documentos','koha','sistema de gestao','gestão'],
+        resp: 'Para usar o sistema ColorADD+CDU numa biblioteca:\n\n1️⃣ Define a cor/símbolo para cada classe CDU da tua colecção\n2️⃣ Usa o separador "Combinar" para criar etiquetas com classe + símbolo + título\n3️⃣ Imprime as etiquetas e cola na lombada dos documentos\n4️⃣ Coloca uma legenda visível na entrada da biblioteca\n\nBenefícios:\n  ✅ Utilizadores com daltonismo localizam documentos autonomamente\n  ✅ Crianças identificam temas por símbolo antes de saber ler\n  ✅ Sinalética mais rápida e visual para todos\n  ✅ Compatível com sistemas Koha e outros SIGB'
+      },
+
+      // === QUE COR USAR PARA... ===
+      {
+        keys: ['que cor usar','que simbolo usar','qual a cor','qual o simbolo','qual o símbolo','recomendar','recomendacao','recomendação','sugestao','sugestão','sugerir'],
+        resp: 'Sugestões de símbolo ColorADD por área:\n\n  📖 Literatura / Língua → ◆ (Amarelo) — CDU 8\n  🎨 Arte / Desporto → ▲ (Azul) — CDU 7\n  ⚖️ Ciências Sociais / Direito → ▲◆ (Verde) — CDU 3\n  🏛️ História / Biografia → ● (Vermelho) — CDU 9\n  🔬 Ciências Naturais → ▲ (Azul) — CDU 5\n  💊 Medicina / Tecnologia → ▲ (Azul) — CDU 6\n  🧠 Filosofia / Psicologia → ◆ (Amarelo) — CDU 1\n  ✝️ Religião → ◆ (Amarelo) — CDU 2\n  📚 Obras de referência → □ (Branco) — CDU 0\n\nPara mais detalhe, usa o separador "📚 Classes CDU" ou "🔗 Combinar"!'
+      },
+
+      // === AGRADECIMENTOS ===
+      {
+        keys: ['obrigad','obrigado','obrigada','thanks','thank you','muito obrigad','fixe','ótimo','otimo','óptimo','optimo','excelente','perfeito'],
+        resp: 'De nada! 😊 Fico feliz em ajudar. Se tiveres mais dúvidas sobre ColorADD, CDU, acessibilidade ou etiquetagem, estou aqui!'
+      },
+
+      // === DESPEDIDA ===
+      {
+        keys: ['adeus','tchau','até logo','ate logo','até já','ate ja','bye','xau'],
+        resp: 'Até logo! 👋 Bom trabalho na biblioteca!'
+      }
+
+    ];
+
+    // ---- MOTOR DE MATCHING ----
+    function normalize(str) {
+      return str.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s▲◆●■□]/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+    }
+
+    function getBotReply(input) {
+      const text = normalize(input);
+      let bestMatch = null;
+      let bestScore = 0;
+
+      for (const entry of KB) {
+        let score = 0;
+        for (const k of entry.keys) {
+          const nk = normalize(k);
+          if (text.includes(nk)) {
+            score += nk.length; // longer matches score higher
+          }
+        }
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = entry;
+        }
+      }
+
+      if (bestMatch && bestScore > 0) return bestMatch.resp;
+
+      return 'Não tenho uma resposta específica para isso, mas posso ajudar com:\n\n• Símbolos ColorADD (▲◆●■□ e combinações)\n• Classes CDU (0 a 9) e cores associadas\n• Daltonismo e tipos de visão\n• Como gerar e imprimir etiquetas\n• Instalar a app offline\n\nTenta reformular a pergunta! 😊';
+    }
+
+    // ---- EVENTOS ----
+    chatFab.addEventListener('click', () => {
+      chatWindow.classList.toggle('open');
+      if (chatWindow.classList.contains('open')) setTimeout(() => chatInput.focus(), 100);
+    });
+    chatClose.addEventListener('click', () => chatWindow.classList.remove('open'));
+
+    document.querySelectorAll('.chat-sug').forEach(btn => {
+      btn.addEventListener('click', () => { chatInput.value = btn.dataset.q; sendChatMessage(); });
+    });
+
+    chatSend.addEventListener('click', sendChatMessage);
+    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChatMessage(); });
+
+    function addMsg(text, role) {
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + role;
+      div.style.whiteSpace = 'pre-line';
+      div.textContent = text;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return div;
+    }
+
+    function sendChatMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      chatInput.value = '';
+      document.getElementById('chatSuggestions').style.display = 'none';
+      addMsg(text, 'user');
+      const typingDiv = addMsg('A pensar…', 'typing');
+      setTimeout(() => {
+        typingDiv.remove();
+        addMsg(getBotReply(text), 'bot');
+      }, 350);
+    }
+  </script>
+</body>
+</html>
