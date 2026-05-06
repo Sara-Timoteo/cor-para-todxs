@@ -3,12 +3,15 @@
    Estrategia: app-shell em cache-first; fontes/CDN em stale-while-revalidate.
    ==================================================================== */
 
-const CACHE_VERSION = 'cor-para-todxs-v1';
+const CACHE_VERSION = 'cor-para-todxs-v2';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-180.png'
 ];
 
 // Install: pre-popula cache com app shell

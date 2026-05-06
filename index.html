@@ -12,8 +12,11 @@
   <!-- PWA: instalável e funciona offline -->
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
-  <link rel="apple-touch-icon" href="./icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+  <link rel="apple-touch-icon" href="./icon-180.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Cor para Todxs">
 
   <!-- Atkinson Hyperlegible (desenhada pelo Braille Institute para baixa visão) -->
@@ -1047,7 +1050,7 @@
       <span aria-hidden="true">?</span>
       <span>Tutorial</span>
     </button>
-    <button id="installBtn" aria-label="Instalar app no dispositivo" hidden>
+    <button id="installBtn" aria-label="Instalar app no dispositivo" aria-haspopup="dialog">
       <span aria-hidden="true">⬇</span>
       <span>Instalar app</span>
     </button>
@@ -1536,6 +1539,24 @@
     <div class="tutorial-footer">
       <button class="btn btn-skip" id="tutorialPrev" disabled>← Anterior</button>
       <button class="btn btn-primary" id="tutorialNext">Próximo →</button>
+    </div>
+  </dialog>
+
+  <!-- ================================================================
+       MODAL — Instruções de instalação manual (iOS, Firefox, etc.)
+       ================================================================ -->
+  <dialog class="tutorial-dialog" id="installDialog" aria-labelledby="install-title">
+    <div class="tutorial-header">
+      <h2 id="install-title">Instalar a app</h2>
+      <button class="chat-close" id="installDialogClose" aria-label="Fechar" style="color:var(--texto)">✕</button>
+    </div>
+    <div class="tutorial-body">
+      <div id="installInstructions">
+        <!-- Preenchido dinamicamente conforme o dispositivo detectado -->
+      </div>
+    </div>
+    <div class="tutorial-footer">
+      <button class="btn btn-primary" id="installDialogDone">Concluído</button>
     </div>
   </dialog>
 
@@ -2429,27 +2450,141 @@
   }
 
   /* ====================================================================
-     16. PWA INSTALL PROMPT
+     16. PWA INSTALL — botão sempre visível com fallback inteligente
      ==================================================================== */
   let deferredInstallPrompt = null;
   const installBtn = document.getElementById('installBtn');
+  const installDialog = document.getElementById('installDialog');
+  const installInstructions = document.getElementById('installInstructions');
+  let lastFocusBeforeInstall = null;
 
+  // Capta o evento nativo quando o browser permite
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-    installBtn.hidden = false;
   });
 
-  installBtn.addEventListener('click', async () => {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt();
-    const choice = await deferredInstallPrompt.userChoice;
-    if (choice && choice.outcome === 'accepted') {
-      announce('App instalada com sucesso.');
+  // Detecta plataforma para mostrar instruções correctas
+  function detectPlatform() {
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isAndroid = /android/i.test(ua);
+    const isFirefox = /firefox/i.test(ua);
+    const isEdge = /edg/i.test(ua);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+    const isChromium = /chrome|chromium|crios/i.test(ua) && !isEdge;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                       || window.navigator.standalone === true;
+    return { isIOS, isAndroid, isFirefox, isEdge, isSafari, isChromium, isStandalone };
+  }
+
+  function getInstallInstructions() {
+    const p = detectPlatform();
+
+    if (p.isStandalone) {
+      return `<div class="tutorial-icon" aria-hidden="true">✅</div>
+              <h3 style="text-align:center; color:var(--sucesso);">A app já está instalada!</h3>
+              <p>Estás a usar a versão instalada da Roda ColorADD+CDU. Está disponível offline e podes lançá-la a qualquer momento pelo ícone no teu dispositivo.</p>`;
     }
-    deferredInstallPrompt = null;
-    installBtn.hidden = true;
+
+    if (p.isIOS && p.isSafari) {
+      return `<div class="tutorial-icon" aria-hidden="true">🍎</div>
+              <h3>Instalar no iPhone / iPad</h3>
+              <ol style="padding-left:1.5rem; line-height:2;">
+                <li>Carrega no botão <strong>Partilhar</strong> <span style="display:inline-block; padding:2px 6px; background:#eee; border-radius:4px;">⬆</span> na barra inferior do Safari.</li>
+                <li>Desliza para baixo e escolhe <strong>"Adicionar ao Ecrã Principal"</strong>.</li>
+                <li>Confirma o nome (Cor para Todxs) e carrega <strong>Adicionar</strong>.</li>
+              </ol>
+              <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:var(--sp-3);">⚠️ No iOS, a instalação só funciona pelo Safari (não pelo Chrome ou Firefox).</p>`;
+    }
+
+    if (p.isIOS) {
+      return `<div class="tutorial-icon" aria-hidden="true">🍎</div>
+              <h3>Estás no iOS sem o Safari</h3>
+              <p>Para instalar esta app no iPhone/iPad, abre <strong>esta página no Safari</strong> (não no Chrome ou Firefox) e segue os passos:</p>
+              <ol style="padding-left:1.5rem; line-height:2;">
+                <li>Botão <strong>Partilhar</strong> ⬆ na barra inferior</li>
+                <li><strong>"Adicionar ao Ecrã Principal"</strong></li>
+                <li><strong>Adicionar</strong></li>
+              </ol>`;
+    }
+
+    if (p.isFirefox) {
+      return `<div class="tutorial-icon" aria-hidden="true">🦊</div>
+              <h3>Firefox</h3>
+              <p>O Firefox <strong>desktop</strong> não tem instalação directa de PWAs. Mas podes:</p>
+              <ul style="padding-left:1.5rem; line-height:2;">
+                <li><strong>Adicionar aos Marcadores</strong> com Ctrl+D — funcionará offline graças ao Service Worker.</li>
+                <li>Ou usar o <strong>Chrome / Edge</strong> nesta mesma página para instalação completa.</li>
+                <li>No <strong>Firefox Android</strong>: Menu ⋮ → "Instalar" / "Adicionar ao ecrã inicial".</li>
+              </ul>`;
+    }
+
+    if (p.isAndroid) {
+      return `<div class="tutorial-icon" aria-hidden="true">🤖</div>
+              <h3>Instalar no Android</h3>
+              <p>Se o botão não te perguntou nada, abre o menu do browser:</p>
+              <ol style="padding-left:1.5rem; line-height:2;">
+                <li>Carrega no menu <strong>⋮</strong> (três pontos no canto superior direito).</li>
+                <li>Escolhe <strong>"Instalar app"</strong> ou <strong>"Adicionar ao ecrã inicial"</strong>.</li>
+                <li>Confirma.</li>
+              </ol>
+              <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:var(--sp-3);">💡 Se a opção não aparecer, navega um pouco pela app primeiro — o browser precisa de ver alguma interação antes de oferecer instalação.</p>`;
+    }
+
+    // Desktop genérico (Chrome / Edge)
+    return `<div class="tutorial-icon" aria-hidden="true">💻</div>
+            <h3>Instalar no computador</h3>
+            <p>Se o botão de instalar não respondeu, podes instalar manualmente:</p>
+            <ol style="padding-left:1.5rem; line-height:2;">
+              <li>Procura na barra de endereço, à direita, um pequeno ícone <strong>⊕</strong> ou <strong>🖥️</strong> (de instalar app).</li>
+              <li>Carrega nele e confirma.</li>
+              <li>Em alternativa: <strong>Menu ⋮ → "Instalar Cor para Todxs..."</strong></li>
+            </ol>
+            <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:var(--sp-3);">💡 Se nada disso aparecer, o teu browser pode não suportar PWAs (testado em Chrome, Edge, Brave, Opera). Em qualquer caso, a app já está disponível offline depois de uma primeira visita — basta voltar a este URL.</p>`;
+  }
+
+  function openInstallDialog() {
+    lastFocusBeforeInstall = document.activeElement;
+    installInstructions.innerHTML = getInstallInstructions();
+    if (typeof installDialog.showModal === 'function') installDialog.showModal();
+    else installDialog.setAttribute('open', '');
+    setTimeout(() => document.getElementById('installDialogDone').focus(), 100);
+  }
+  function closeInstallDialog() {
+    try { installDialog.close(); } catch (e) { installDialog.removeAttribute('open'); }
+    if (lastFocusBeforeInstall && typeof lastFocusBeforeInstall.focus === 'function') {
+      lastFocusBeforeInstall.focus();
+    }
+  }
+  document.getElementById('installDialogClose').addEventListener('click', closeInstallDialog);
+  document.getElementById('installDialogDone').addEventListener('click', closeInstallDialog);
+  installDialog.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeInstallDialog();
   });
+
+  // Comportamento principal do botão Instalar
+  installBtn.addEventListener('click', async () => {
+    if (deferredInstallPrompt) {
+      // Browser suporta — usa prompt nativo
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      if (choice && choice.outcome === 'accepted') {
+        announce('App instalada com sucesso.');
+        installBtn.hidden = true;
+      }
+      deferredInstallPrompt = null;
+    } else {
+      // Sem prompt nativo — mostra instruções manuais
+      openInstallDialog();
+    }
+  });
+
+  // Esconde o botão se já estiver instalada
+  if (window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true) {
+    installBtn.hidden = true;
+  }
 
   window.addEventListener('appinstalled', () => {
     installBtn.hidden = true;
