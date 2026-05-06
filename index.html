@@ -9,6 +9,13 @@
   <meta name="color-scheme" content="light">
   <title>Roda ColorADD + CDU | Cor para Todxs</title>
 
+  <!-- PWA: instalável e funciona offline -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" href="./icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Cor para Todxs">
+
   <!-- Atkinson Hyperlegible (desenhada pelo Braille Institute para baixa visão) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -919,13 +926,94 @@
     }
 
     /* ================================================================
+       TUTORIAL — slideshow modal
+       ================================================================ */
+    .tutorial-dialog {
+      border: none; border-radius: var(--radius-lg);
+      padding: 0;
+      max-width: 540px; width: calc(100% - var(--sp-4));
+      background: var(--superficie); color: var(--texto);
+      box-shadow: var(--shadow-lg);
+      max-height: 90vh; max-height: 90dvh;
+    }
+    .tutorial-dialog::backdrop {
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(3px);
+    }
+    .tutorial-header {
+      padding: var(--sp-4);
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--borda-suave);
+    }
+    .tutorial-header h2 { margin: 0; font-size: 1.15rem; }
+    .tutorial-body {
+      padding: var(--sp-5) var(--sp-4);
+      min-height: 280px;
+      overflow-y: auto;
+    }
+    .tutorial-slide { display: none; }
+    .tutorial-slide[data-active="true"] { display: block; }
+    body:not(.reduced-motion) .tutorial-slide[data-active="true"] {
+      animation: fadeIn 0.3s ease;
+    }
+    .tutorial-slide h3 {
+      margin: var(--sp-2) 0 var(--sp-3);
+      font-size: 1.25rem;
+      color: var(--azul);
+    }
+    .tutorial-icon {
+      font-size: 3rem; line-height: 1;
+      text-align: center;
+      margin-bottom: var(--sp-3);
+    }
+    .tutorial-slide p { margin-bottom: var(--sp-3); }
+    .tutorial-slide ul { padding-left: var(--sp-5); margin: var(--sp-2) 0; }
+    .tutorial-slide li { margin-bottom: var(--sp-2); }
+    .tutorial-slide strong { color: var(--azul); }
+    body.calm-mode .tutorial-slide h3,
+    body.calm-mode .tutorial-slide strong { color: var(--texto); }
+
+    .tutorial-dots {
+      display: flex; gap: var(--sp-2);
+      justify-content: center;
+      padding: 0 var(--sp-4) var(--sp-3);
+    }
+    .tutorial-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--borda);
+      border: none; padding: 0;
+      cursor: pointer;
+      transition: width 0.2s, background-color 0.2s, border-radius 0.2s;
+    }
+    .tutorial-dot[aria-current="true"] {
+      background: var(--azul); width: 28px;
+      border-radius: 5px;
+    }
+    .tutorial-dot:focus-visible {
+      outline: 3px solid var(--foco); outline-offset: 2px;
+    }
+
+    .tutorial-footer {
+      display: flex; gap: var(--sp-2);
+      padding: var(--sp-4);
+      border-top: 1px solid var(--borda-suave);
+      flex-wrap: wrap;
+    }
+    .tutorial-footer .btn { flex: 1; min-width: 120px; }
+    .tutorial-footer .btn-skip {
+      background: transparent; color: var(--texto-suave);
+      border-color: var(--borda);
+    }
+
+    /* ================================================================
        21. PRINT
        ================================================================ */
     @media print {
       body { background: white; color: black; filter: none !important; }
       .a11y-bar, .skip-link, .tablist, .filter-controls,
       .wheel-wrapper, .speak-btn, .fab, .chat-window,
-      .form-row, .btn, .a11y-panel, .page-footer { display: none !important; }
+      .form-row, .btn, .a11y-panel, .tutorial-dialog, .page-footer { display: none !important; }
       .tabpanel { display: block !important; }
       .surface, .label-preview {
         box-shadow: none !important; border: 2px solid black !important;
@@ -954,6 +1042,14 @@
     <button id="a11yPanelOpen" aria-haspopup="dialog" aria-label="Abrir opções de acessibilidade">
       <span aria-hidden="true">⚙</span>
       <span>Acessibilidade</span>
+    </button>
+    <button id="tutorialOpen" aria-haspopup="dialog" aria-label="Abrir tutorial de utilização">
+      <span aria-hidden="true">?</span>
+      <span>Tutorial</span>
+    </button>
+    <button id="installBtn" aria-label="Instalar app no dispositivo" hidden>
+      <span aria-hidden="true">⬇</span>
+      <span>Instalar app</span>
     </button>
   </div>
 
@@ -1066,7 +1162,7 @@
        ================================================================ -->
   <header class="page-header">
     <h1><span class="deco-emoji" aria-hidden="true">🌈 </span>Roda ColorADD + Classificação Decimal Universal</h1>
-    <p class="subtitle">Alfabeto da cor completo &mdash; ferramenta inclusiva</p>
+    <p class="subtitle">Alfabeto da cor completo &mdash; ferramenta inclusiva para bibliotecas</p>
   </header>
 
   <!-- ================================================================
@@ -1307,9 +1403,9 @@
           ============================================================
         -->
         <form id="contactForm"
-              action="https://formspree.io/f/mojrwbbv"
+              action="https://formspree.io/f/SEU_ID_FORMSPREE"
               method="POST"
-              data-fallback-email="windsidh@gmail.pt"
+              data-fallback-email="contacto@exemplo.pt"
               novalidate>
 
           <!-- Honeypot anti-spam (escondido para humanos) -->
@@ -1365,6 +1461,83 @@
     </section>
 
   </main>
+
+  <!-- ================================================================
+       TUTORIAL — abre na 1ª visita e via botão "?"
+       ================================================================ -->
+  <dialog class="tutorial-dialog" id="tutorialDialog" aria-labelledby="tut-title">
+    <div class="tutorial-header">
+      <h2 id="tut-title">Como usar a Roda ColorADD + CDU</h2>
+      <button class="chat-close" id="tutorialClose" aria-label="Fechar tutorial" style="color:var(--texto)">✕</button>
+    </div>
+
+    <div class="tutorial-body" id="tutorialBody">
+
+      <article class="tutorial-slide" data-slide="0" data-active="true">
+        <div class="tutorial-icon" aria-hidden="true">🌈</div>
+        <h3>Bem-vinda!</h3>
+        <p>Esta é a <strong>Roda ColorADD + CDU</strong>, uma ferramenta inclusiva para etiquetar documentos numa biblioteca usando símbolos universais que qualquer pessoa pode reconhecer — incluindo quem tem daltonismo ou baixa visão.</p>
+        <p>Em poucos passos vais saber tudo o que precisas. Carrega <strong>Próximo</strong> para começar.</p>
+      </article>
+
+      <article class="tutorial-slide" data-slide="1">
+        <div class="tutorial-icon" aria-hidden="true">🧭</div>
+        <h3>Os 4 separadores</h3>
+        <p>No topo da app encontras quatro secções:</p>
+        <ul>
+          <li><strong>🎨 ColorADD</strong> — escolhe uma cor e gera uma etiqueta simples.</li>
+          <li><strong>📚 Classes CDU</strong> — vê as classes da Classificação Decimal Universal e a cor sugerida para cada uma.</li>
+          <li><strong>🔗 Combinar</strong> — junta cor + classe + título numa única etiqueta para colar na lombada.</li>
+          <li><strong>✉️ Contacto</strong> — envia dúvidas, reporta problemas ou faz sugestões.</li>
+        </ul>
+      </article>
+
+      <article class="tutorial-slide" data-slide="2">
+        <div class="tutorial-icon" aria-hidden="true">🔈</div>
+        <h3>Acessibilidade no centro</h3>
+        <p>Toda a app é pensada para ser acessível:</p>
+        <ul>
+          <li><strong>Ouvir página</strong> (botão no topo) — lê todo o conteúdo em voz alta, em pt-PT.</li>
+          <li><strong>Ouvir esta secção</strong> — botão em cada separador para ler só essa parte.</li>
+          <li><strong>Acessibilidade ⚙</strong> — abre o painel com tamanho de texto, fonte para dislexia, alto contraste, movimento reduzido e modo calmo.</li>
+          <li><strong>Sons multissensoriais</strong> — cada cor tem uma frequência musical (ativa em ⚙).</li>
+        </ul>
+      </article>
+
+      <article class="tutorial-slide" data-slide="3">
+        <div class="tutorial-icon" aria-hidden="true">👁️</div>
+        <h3>Simulador de daltonismo</h3>
+        <p>No separador 🎨 ColorADD, em cima, podes simular como cada tipo de visão cromática vê a interface — protanopia, deuteranopia, tritanopia, monocromacia, entre outros.</p>
+        <p>É excelente para <strong>testar etiquetas antes de imprimir</strong> e perceberes que o sistema continua legível para todos.</p>
+      </article>
+
+      <article class="tutorial-slide" data-slide="4">
+        <div class="tutorial-icon" aria-hidden="true">📱</div>
+        <h3>Funciona offline</h3>
+        <p>Esta app pode ser instalada no teu dispositivo e usada <strong>sem internet</strong>:</p>
+        <ul>
+          <li><strong>Telemóvel</strong>: menu do browser → "Adicionar ao ecrã inicial" / "Adicionar ao ecrã principal".</li>
+          <li><strong>Computador</strong>: ícone de instalação na barra de endereço, ou botão <strong>⬇ Instalar app</strong> no topo (se aparecer).</li>
+        </ul>
+        <p>Tens dúvidas? Carrega no botão verde 💬 no canto inferior direito para abrir o assistente.</p>
+        <p style="margin-top:var(--sp-4); font-weight:700;">🎉 Boas etiquetagens!</p>
+      </article>
+
+    </div>
+
+    <div class="tutorial-dots" role="tablist" aria-label="Progresso do tutorial">
+      <button class="tutorial-dot" data-goto="0" aria-current="true" aria-label="Slide 1 de 5"></button>
+      <button class="tutorial-dot" data-goto="1" aria-label="Slide 2 de 5"></button>
+      <button class="tutorial-dot" data-goto="2" aria-label="Slide 3 de 5"></button>
+      <button class="tutorial-dot" data-goto="3" aria-label="Slide 4 de 5"></button>
+      <button class="tutorial-dot" data-goto="4" aria-label="Slide 5 de 5"></button>
+    </div>
+
+    <div class="tutorial-footer">
+      <button class="btn btn-skip" id="tutorialPrev" disabled>← Anterior</button>
+      <button class="btn btn-primary" id="tutorialNext">Próximo →</button>
+    </div>
+  </dialog>
 
   <!-- ================================================================
        FABs — Sons & Chat
@@ -2057,6 +2230,8 @@
       resp: 'Sugestões de símbolo ColorADD por área:\n\n  📖 Literatura / Língua → ◆ (Amarelo) — CDU 8\n  🎨 Arte / Desporto → ▲ (Azul) — CDU 7\n  ⚖️ Ciências Sociais / Direito → ▲◆ (Verde) — CDU 3\n  🏛️ História / Biografia → ● (Vermelho) — CDU 9\n  🔬 Ciências Naturais → ▲ (Azul) — CDU 5\n  💊 Medicina / Tecnologia → ▲ (Azul) — CDU 6\n  🧠 Filosofia / Psicologia → ◆ (Amarelo) — CDU 1\n  ✝️ Religião → ◆ (Amarelo) — CDU 2\n  📚 Obras de referência → □ (Branco) — CDU 0\n\nPara mais detalhe, usa o separador "📚 Classes CDU" ou "🔗 Combinar"!' },
     { keys: ['contacto','contactar','email','reportar','sugestao','enviar mensagem','formulario','formulário'],
       resp: 'Para contacto, sugestão ou reportar problema, usa o separador "✉️ Contacto" no topo da app! O formulário envia diretamente para o email da equipa.' },
+    { keys: ['tutorial','como usar','ajuda inicial','primeira vez','passo a passo','guia','walkthrough','introducao','introdução'],
+      resp: 'Tens um tutorial completo na app! 🎓\n\nCarrega no botão "?" Tutorial no topo, ao lado do botão de Acessibilidade. O tutorial tem 5 slides:\n\n1️⃣ Bem-vinda — visão geral\n2️⃣ Os 4 separadores — ColorADD, CDU, Combinar, Contacto\n3️⃣ Funcionalidades de acessibilidade\n4️⃣ Simulador de daltonismo\n5️⃣ Como instalar para usar offline\n\nO tutorial abre automaticamente na primeira visita, mas podes voltar a vê-lo sempre que quiseres.' },
     { keys: ['obrigad','obrigado','obrigada','thanks','thank you','muito obrigad','fixe','ótimo','otimo','óptimo','optimo','excelente','perfeito'],
       resp: 'De nada! 😊 Fico feliz em ajudar. Se tiveres mais dúvidas sobre ColorADD, CDU, acessibilidade ou etiquetagem, estou aqui!' },
     { keys: ['adeus','tchau','até logo','ate logo','até já','ate ja','bye','xau'],
@@ -2190,10 +2365,123 @@
   renderCDUGrid();
   updateUI('azul');
 
-  // Service Worker (opcional — apenas se já existir sw.js no repo)
-  // if ('serviceWorker' in navigator) {
-  //   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
-  // }
+  /* ====================================================================
+     15. TUTORIAL
+     ==================================================================== */
+  const TUTORIAL_KEY = 'cor-para-todxs-tutorial-seen-v1';
+  const tutDialog = document.getElementById('tutorialDialog');
+  const tutSlides = document.querySelectorAll('.tutorial-slide');
+  const tutDots = document.querySelectorAll('.tutorial-dot');
+  const tutPrev = document.getElementById('tutorialPrev');
+  const tutNext = document.getElementById('tutorialNext');
+  const tutClose = document.getElementById('tutorialClose');
+  const tutOpenBtn = document.getElementById('tutorialOpen');
+  let tutIndex = 0;
+  let lastFocusBeforeTutorial = null;
+
+  function showSlide(i) {
+    tutIndex = Math.max(0, Math.min(tutSlides.length - 1, i));
+    tutSlides.forEach((s, idx) => s.dataset.active = String(idx === tutIndex));
+    tutDots.forEach((d, idx) => {
+      if (idx === tutIndex) d.setAttribute('aria-current', 'true');
+      else d.removeAttribute('aria-current');
+    });
+    tutPrev.disabled = tutIndex === 0;
+    tutNext.textContent = tutIndex === tutSlides.length - 1 ? 'Concluir ✓' : 'Próximo →';
+    // Anuncia o slide para SR
+    announce(`Slide ${tutIndex + 1} de ${tutSlides.length}.`);
+  }
+
+  function openTutorial() {
+    lastFocusBeforeTutorial = document.activeElement;
+    showSlide(0);
+    if (typeof tutDialog.showModal === 'function') tutDialog.showModal();
+    else tutDialog.setAttribute('open', '');
+    setTimeout(() => tutNext.focus(), 100);
+  }
+  function closeTutorial() {
+    try { tutDialog.close(); } catch (e) { tutDialog.removeAttribute('open'); }
+    localStorage.setItem(TUTORIAL_KEY, '1');
+    if (lastFocusBeforeTutorial && typeof lastFocusBeforeTutorial.focus === 'function') {
+      lastFocusBeforeTutorial.focus();
+    }
+  }
+
+  tutPrev.addEventListener('click', () => showSlide(tutIndex - 1));
+  tutNext.addEventListener('click', () => {
+    if (tutIndex === tutSlides.length - 1) closeTutorial();
+    else showSlide(tutIndex + 1);
+  });
+  tutClose.addEventListener('click', closeTutorial);
+  tutOpenBtn.addEventListener('click', openTutorial);
+  tutDots.forEach(dot => dot.addEventListener('click', () => showSlide(Number(dot.dataset.goto))));
+
+  // Setas dentro do tutorial navegam entre slides
+  tutDialog.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); if (tutIndex < tutSlides.length - 1) showSlide(tutIndex + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); if (tutIndex > 0) showSlide(tutIndex - 1); }
+    else if (e.key === 'Escape') { closeTutorial(); }
+  });
+
+  // Auto-abre na 1ª visita
+  if (!localStorage.getItem(TUTORIAL_KEY)) {
+    setTimeout(openTutorial, 600);
+  }
+
+  /* ====================================================================
+     16. PWA INSTALL PROMPT
+     ==================================================================== */
+  let deferredInstallPrompt = null;
+  const installBtn = document.getElementById('installBtn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    installBtn.hidden = false;
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    const choice = await deferredInstallPrompt.userChoice;
+    if (choice && choice.outcome === 'accepted') {
+      announce('App instalada com sucesso.');
+    }
+    deferredInstallPrompt = null;
+    installBtn.hidden = true;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installBtn.hidden = true;
+    deferredInstallPrompt = null;
+    announce('App instalada e disponível offline.');
+  });
+
+  /* ====================================================================
+     17. SERVICE WORKER — funcionamento offline
+     ==================================================================== */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => {
+          // Verifica updates a cada 60min e quando volta a focar a janela
+          setInterval(() => reg.update().catch(() => {}), 60 * 60 * 1000);
+          window.addEventListener('focus', () => reg.update().catch(() => {}));
+
+          // Quando há novo SW à espera, avisa o utilizador discretamente
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            if (!newWorker) return;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                announce('Há uma nova versão da app. Recarregue a página para atualizar.');
+              }
+            });
+          });
+        })
+        .catch(err => console.warn('[SW] Registo falhou:', err));
+    });
+  }
   </script>
 </body>
 </html>
