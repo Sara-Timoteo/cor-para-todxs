@@ -1407,9 +1407,9 @@
           ============================================================
         -->
         <form id="contactForm"
-              action="https://formspree.io/f/SEU_ID_FORMSPREE"
+              action="https://formspree.io/f/mojrwbbv"
               method="POST"
-              data-fallback-email="contacto@exemplo.pt"
+              data-fallback-email="windsidh@gmail.com"
               novalidate>
 
           <!-- Honeypot anti-spam (escondido para humanos) -->
@@ -2118,8 +2118,8 @@
     }
     if (honeypot.value) return; // bot detected, silent fail
 
-    // Detect if Formspree is configured
-    const isFormspreeConfigured = !contactForm.action.includes('SEU_ID_FORMSPREE');
+    // Always use mailto fallback (no Formspree configured)
+    const isFormspreeConfigured = contactForm.action.startsWith('https://formspree.io/');
 
     if (!isFormspreeConfigured) {
       // Fallback: open mailto link
@@ -2388,210 +2388,214 @@
   updateUI('azul');
 
   /* ====================================================================
-     15. TUTORIAL
+     15. TUTORIAL (encapsulado em try/catch — se falhar, restante app funciona)
      ==================================================================== */
-  const TUTORIAL_KEY = 'cor-para-todxs-tutorial-seen-v1';
-  const tutDialog = document.getElementById('tutorialDialog');
-  const tutSlides = document.querySelectorAll('.tutorial-slide');
-  const tutDots = document.querySelectorAll('.tutorial-dot');
-  const tutPrev = document.getElementById('tutorialPrev');
-  const tutNext = document.getElementById('tutorialNext');
-  const tutClose = document.getElementById('tutorialClose');
-  const tutOpenBtn = document.getElementById('tutorialOpen');
-  let tutIndex = 0;
-  let lastFocusBeforeTutorial = null;
+  try {
+    const TUTORIAL_KEY = 'cor-para-todxs-tutorial-seen-v1';
+    const tutDialog = document.getElementById('tutorialDialog');
+    const tutSlides = document.querySelectorAll('.tutorial-slide');
+    const tutDots = document.querySelectorAll('.tutorial-dot');
+    const tutPrev = document.getElementById('tutorialPrev');
+    const tutNext = document.getElementById('tutorialNext');
+    const tutClose = document.getElementById('tutorialClose');
+    const tutOpenBtn = document.getElementById('tutorialOpen');
 
-  function showSlide(i) {
-    tutIndex = Math.max(0, Math.min(tutSlides.length - 1, i));
-    tutSlides.forEach((s, idx) => s.dataset.active = String(idx === tutIndex));
-    tutDots.forEach((d, idx) => {
-      if (idx === tutIndex) d.setAttribute('aria-current', 'true');
-      else d.removeAttribute('aria-current');
-    });
-    tutPrev.disabled = tutIndex === 0;
-    tutNext.textContent = tutIndex === tutSlides.length - 1 ? 'Concluir ✓' : 'Próximo →';
-    // Anuncia o slide para SR
-    announce(`Slide ${tutIndex + 1} de ${tutSlides.length}.`);
-  }
+    if (!tutDialog || !tutPrev || !tutNext || !tutClose || !tutOpenBtn) {
+      console.warn('[Tutorial] Elementos em falta — tutorial desactivado.');
+    } else {
+      let tutIndex = 0;
+      let lastFocusBeforeTutorial = null;
 
-  function openTutorial() {
-    lastFocusBeforeTutorial = document.activeElement;
-    showSlide(0);
-    if (typeof tutDialog.showModal === 'function') tutDialog.showModal();
-    else tutDialog.setAttribute('open', '');
-    setTimeout(() => tutNext.focus(), 100);
-  }
-  function closeTutorial() {
-    try { tutDialog.close(); } catch (e) { tutDialog.removeAttribute('open'); }
-    localStorage.setItem(TUTORIAL_KEY, '1');
-    if (lastFocusBeforeTutorial && typeof lastFocusBeforeTutorial.focus === 'function') {
-      lastFocusBeforeTutorial.focus();
+      function showSlide(i) {
+        tutIndex = Math.max(0, Math.min(tutSlides.length - 1, i));
+        tutSlides.forEach((s, idx) => s.dataset.active = String(idx === tutIndex));
+        tutDots.forEach((d, idx) => {
+          if (idx === tutIndex) d.setAttribute('aria-current', 'true');
+          else d.removeAttribute('aria-current');
+        });
+        tutPrev.disabled = tutIndex === 0;
+        tutNext.textContent = tutIndex === tutSlides.length - 1 ? 'Concluir ✓' : 'Próximo →';
+        announce(`Slide ${tutIndex + 1} de ${tutSlides.length}.`);
+      }
+
+      function openTutorial() {
+        lastFocusBeforeTutorial = document.activeElement;
+        showSlide(0);
+        if (typeof tutDialog.showModal === 'function') tutDialog.showModal();
+        else tutDialog.setAttribute('open', '');
+        setTimeout(() => tutNext.focus(), 100);
+      }
+      function closeTutorial() {
+        try { tutDialog.close(); } catch (e) { tutDialog.removeAttribute('open'); }
+        localStorage.setItem(TUTORIAL_KEY, '1');
+        if (lastFocusBeforeTutorial && typeof lastFocusBeforeTutorial.focus === 'function') {
+          lastFocusBeforeTutorial.focus();
+        }
+      }
+
+      tutPrev.addEventListener('click', () => showSlide(tutIndex - 1));
+      tutNext.addEventListener('click', () => {
+        if (tutIndex === tutSlides.length - 1) closeTutorial();
+        else showSlide(tutIndex + 1);
+      });
+      tutClose.addEventListener('click', closeTutorial);
+      tutOpenBtn.addEventListener('click', openTutorial);
+      tutDots.forEach(dot => dot.addEventListener('click', () => showSlide(Number(dot.dataset.goto))));
+
+      tutDialog.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight') { e.preventDefault(); if (tutIndex < tutSlides.length - 1) showSlide(tutIndex + 1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); if (tutIndex > 0) showSlide(tutIndex - 1); }
+        else if (e.key === 'Escape') { closeTutorial(); }
+      });
+
+      // Auto-abre na 1ª visita
+      if (!localStorage.getItem(TUTORIAL_KEY)) {
+        setTimeout(openTutorial, 600);
+      }
     }
-  }
-
-  tutPrev.addEventListener('click', () => showSlide(tutIndex - 1));
-  tutNext.addEventListener('click', () => {
-    if (tutIndex === tutSlides.length - 1) closeTutorial();
-    else showSlide(tutIndex + 1);
-  });
-  tutClose.addEventListener('click', closeTutorial);
-  tutOpenBtn.addEventListener('click', openTutorial);
-  tutDots.forEach(dot => dot.addEventListener('click', () => showSlide(Number(dot.dataset.goto))));
-
-  // Setas dentro do tutorial navegam entre slides
-  tutDialog.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight') { e.preventDefault(); if (tutIndex < tutSlides.length - 1) showSlide(tutIndex + 1); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); if (tutIndex > 0) showSlide(tutIndex - 1); }
-    else if (e.key === 'Escape') { closeTutorial(); }
-  });
-
-  // Auto-abre na 1ª visita
-  if (!localStorage.getItem(TUTORIAL_KEY)) {
-    setTimeout(openTutorial, 600);
+  } catch (err) {
+    console.error('[Tutorial] erro:', err);
   }
 
   /* ====================================================================
-     16. PWA INSTALL — botão sempre visível com fallback inteligente
+     16. PWA INSTALL (encapsulado)
      ==================================================================== */
-  let deferredInstallPrompt = null;
-  const installBtn = document.getElementById('installBtn');
-  const installDialog = document.getElementById('installDialog');
-  const installInstructions = document.getElementById('installInstructions');
-  let lastFocusBeforeInstall = null;
+  try {
+    let deferredInstallPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+    const installDialog = document.getElementById('installDialog');
+    const installInstructions = document.getElementById('installInstructions');
+    let lastFocusBeforeInstall = null;
 
-  // Capta o evento nativo quando o browser permite
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredInstallPrompt = e;
-  });
+    if (!installBtn || !installDialog || !installInstructions) {
+      console.warn('[Install] Elementos em falta.');
+    } else {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+      });
 
-  // Detecta plataforma para mostrar instruções correctas
-  function detectPlatform() {
-    const ua = navigator.userAgent;
-    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-    const isAndroid = /android/i.test(ua);
-    const isFirefox = /firefox/i.test(ua);
-    const isEdge = /edg/i.test(ua);
-    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-    const isChromium = /chrome|chromium|crios/i.test(ua) && !isEdge;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-                       || window.navigator.standalone === true;
-    return { isIOS, isAndroid, isFirefox, isEdge, isSafari, isChromium, isStandalone };
-  }
+      function detectPlatform() {
+        const ua = navigator.userAgent;
+        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        const isAndroid = /android/i.test(ua);
+        const isFirefox = /firefox/i.test(ua);
+        const isEdge = /edg/i.test(ua);
+        const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+        const isChromium = /chrome|chromium|crios/i.test(ua) && !isEdge;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                           || window.navigator.standalone === true;
+        return { isIOS, isAndroid, isFirefox, isEdge, isSafari, isChromium, isStandalone };
+      }
 
-  function getInstallInstructions() {
-    const p = detectPlatform();
+      function getInstallInstructions() {
+        const p = detectPlatform();
+        if (p.isStandalone) {
+          return `<div class="tutorial-icon" aria-hidden="true">✅</div>
+                  <h3 style="text-align:center; color:var(--sucesso);">A app já está instalada!</h3>
+                  <p>Estás a usar a versão instalada da Roda ColorADD+CDU. Está disponível offline e podes lançá-la a qualquer momento pelo ícone no teu dispositivo.</p>`;
+        }
+        if (p.isIOS && p.isSafari) {
+          return `<div class="tutorial-icon" aria-hidden="true">🍎</div>
+                  <h3>Instalar no iPhone / iPad</h3>
+                  <ol style="padding-left:1.5rem; line-height:2;">
+                    <li>Carrega no botão <strong>Partilhar</strong> ⬆ na barra inferior do Safari.</li>
+                    <li>Desliza para baixo e escolhe <strong>"Adicionar ao Ecrã Principal"</strong>.</li>
+                    <li>Confirma o nome (Cor para Todxs) e carrega <strong>Adicionar</strong>.</li>
+                  </ol>
+                  <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:var(--sp-3);">⚠️ No iOS, a instalação só funciona pelo Safari (não pelo Chrome ou Firefox).</p>`;
+        }
+        if (p.isIOS) {
+          return `<div class="tutorial-icon" aria-hidden="true">🍎</div>
+                  <h3>Estás no iOS sem o Safari</h3>
+                  <p>Para instalar esta app no iPhone/iPad, abre <strong>esta página no Safari</strong> (não no Chrome ou Firefox) e segue:</p>
+                  <ol style="padding-left:1.5rem; line-height:2;">
+                    <li>Botão <strong>Partilhar</strong> ⬆ na barra inferior</li>
+                    <li><strong>"Adicionar ao Ecrã Principal"</strong></li>
+                    <li><strong>Adicionar</strong></li>
+                  </ol>`;
+        }
+        if (p.isFirefox) {
+          return `<div class="tutorial-icon" aria-hidden="true">🦊</div>
+                  <h3>Firefox</h3>
+                  <p>O Firefox <strong>desktop</strong> não tem instalação directa de PWAs. Mas podes:</p>
+                  <ul style="padding-left:1.5rem; line-height:2;">
+                    <li><strong>Adicionar aos Marcadores</strong> com Ctrl+D — funcionará offline graças ao Service Worker.</li>
+                    <li>Ou usar o <strong>Chrome / Edge</strong> nesta mesma página.</li>
+                    <li>No <strong>Firefox Android</strong>: Menu ⋮ → "Instalar".</li>
+                  </ul>`;
+        }
+        if (p.isAndroid) {
+          return `<div class="tutorial-icon" aria-hidden="true">🤖</div>
+                  <h3>Instalar no Android</h3>
+                  <p>Se o botão não te perguntou nada, abre o menu do browser:</p>
+                  <ol style="padding-left:1.5rem; line-height:2;">
+                    <li>Menu <strong>⋮</strong> (três pontos no canto superior direito).</li>
+                    <li><strong>"Instalar app"</strong> ou <strong>"Adicionar ao ecrã inicial"</strong>.</li>
+                    <li>Confirma.</li>
+                  </ol>
+                  <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:var(--sp-3);">💡 Se a opção não aparecer, navega um pouco pela app primeiro.</p>`;
+        }
+        return `<div class="tutorial-icon" aria-hidden="true">💻</div>
+                <h3>Instalar no computador</h3>
+                <p>Se o botão de instalar não respondeu, podes instalar manualmente:</p>
+                <ol style="padding-left:1.5rem; line-height:2;">
+                  <li>Procura na barra de endereço, à direita, o ícone <strong>⊕</strong> ou <strong>🖥️</strong> (instalar).</li>
+                  <li>Carrega nele e confirma.</li>
+                  <li>Em alternativa: <strong>Menu ⋮ → "Instalar Cor para Todxs..."</strong></li>
+                </ol>
+                <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:var(--sp-3);">💡 Em qualquer caso, a app já está disponível offline depois de uma primeira visita.</p>`;
+      }
 
-    if (p.isStandalone) {
-      return `<div class="tutorial-icon" aria-hidden="true">✅</div>
-              <h3 style="text-align:center; color:var(--sucesso);">A app já está instalada!</h3>
-              <p>Estás a usar a versão instalada da Roda ColorADD+CDU. Está disponível offline e podes lançá-la a qualquer momento pelo ícone no teu dispositivo.</p>`;
-    }
+      function openInstallDialog() {
+        lastFocusBeforeInstall = document.activeElement;
+        installInstructions.innerHTML = getInstallInstructions();
+        if (typeof installDialog.showModal === 'function') installDialog.showModal();
+        else installDialog.setAttribute('open', '');
+        setTimeout(() => document.getElementById('installDialogDone').focus(), 100);
+      }
+      function closeInstallDialog() {
+        try { installDialog.close(); } catch (e) { installDialog.removeAttribute('open'); }
+        if (lastFocusBeforeInstall && typeof lastFocusBeforeInstall.focus === 'function') {
+          lastFocusBeforeInstall.focus();
+        }
+      }
+      const installCloseBtn = document.getElementById('installDialogClose');
+      const installDoneBtn = document.getElementById('installDialogDone');
+      if (installCloseBtn) installCloseBtn.addEventListener('click', closeInstallDialog);
+      if (installDoneBtn) installDoneBtn.addEventListener('click', closeInstallDialog);
+      installDialog.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeInstallDialog();
+      });
 
-    if (p.isIOS && p.isSafari) {
-      return `<div class="tutorial-icon" aria-hidden="true">🍎</div>
-              <h3>Instalar no iPhone / iPad</h3>
-              <ol style="padding-left:1.5rem; line-height:2;">
-                <li>Carrega no botão <strong>Partilhar</strong> <span style="display:inline-block; padding:2px 6px; background:#eee; border-radius:4px;">⬆</span> na barra inferior do Safari.</li>
-                <li>Desliza para baixo e escolhe <strong>"Adicionar ao Ecrã Principal"</strong>.</li>
-                <li>Confirma o nome (Cor para Todxs) e carrega <strong>Adicionar</strong>.</li>
-              </ol>
-              <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:var(--sp-3);">⚠️ No iOS, a instalação só funciona pelo Safari (não pelo Chrome ou Firefox).</p>`;
-    }
+      installBtn.addEventListener('click', async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          const choice = await deferredInstallPrompt.userChoice;
+          if (choice && choice.outcome === 'accepted') {
+            announce('App instalada com sucesso.');
+            installBtn.hidden = true;
+          }
+          deferredInstallPrompt = null;
+        } else {
+          openInstallDialog();
+        }
+      });
 
-    if (p.isIOS) {
-      return `<div class="tutorial-icon" aria-hidden="true">🍎</div>
-              <h3>Estás no iOS sem o Safari</h3>
-              <p>Para instalar esta app no iPhone/iPad, abre <strong>esta página no Safari</strong> (não no Chrome ou Firefox) e segue os passos:</p>
-              <ol style="padding-left:1.5rem; line-height:2;">
-                <li>Botão <strong>Partilhar</strong> ⬆ na barra inferior</li>
-                <li><strong>"Adicionar ao Ecrã Principal"</strong></li>
-                <li><strong>Adicionar</strong></li>
-              </ol>`;
-    }
-
-    if (p.isFirefox) {
-      return `<div class="tutorial-icon" aria-hidden="true">🦊</div>
-              <h3>Firefox</h3>
-              <p>O Firefox <strong>desktop</strong> não tem instalação directa de PWAs. Mas podes:</p>
-              <ul style="padding-left:1.5rem; line-height:2;">
-                <li><strong>Adicionar aos Marcadores</strong> com Ctrl+D — funcionará offline graças ao Service Worker.</li>
-                <li>Ou usar o <strong>Chrome / Edge</strong> nesta mesma página para instalação completa.</li>
-                <li>No <strong>Firefox Android</strong>: Menu ⋮ → "Instalar" / "Adicionar ao ecrã inicial".</li>
-              </ul>`;
-    }
-
-    if (p.isAndroid) {
-      return `<div class="tutorial-icon" aria-hidden="true">🤖</div>
-              <h3>Instalar no Android</h3>
-              <p>Se o botão não te perguntou nada, abre o menu do browser:</p>
-              <ol style="padding-left:1.5rem; line-height:2;">
-                <li>Carrega no menu <strong>⋮</strong> (três pontos no canto superior direito).</li>
-                <li>Escolhe <strong>"Instalar app"</strong> ou <strong>"Adicionar ao ecrã inicial"</strong>.</li>
-                <li>Confirma.</li>
-              </ol>
-              <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:var(--sp-3);">💡 Se a opção não aparecer, navega um pouco pela app primeiro — o browser precisa de ver alguma interação antes de oferecer instalação.</p>`;
-    }
-
-    // Desktop genérico (Chrome / Edge)
-    return `<div class="tutorial-icon" aria-hidden="true">💻</div>
-            <h3>Instalar no computador</h3>
-            <p>Se o botão de instalar não respondeu, podes instalar manualmente:</p>
-            <ol style="padding-left:1.5rem; line-height:2;">
-              <li>Procura na barra de endereço, à direita, um pequeno ícone <strong>⊕</strong> ou <strong>🖥️</strong> (de instalar app).</li>
-              <li>Carrega nele e confirma.</li>
-              <li>Em alternativa: <strong>Menu ⋮ → "Instalar Cor para Todxs..."</strong></li>
-            </ol>
-            <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:var(--sp-3);">💡 Se nada disso aparecer, o teu browser pode não suportar PWAs (testado em Chrome, Edge, Brave, Opera). Em qualquer caso, a app já está disponível offline depois de uma primeira visita — basta voltar a este URL.</p>`;
-  }
-
-  function openInstallDialog() {
-    lastFocusBeforeInstall = document.activeElement;
-    installInstructions.innerHTML = getInstallInstructions();
-    if (typeof installDialog.showModal === 'function') installDialog.showModal();
-    else installDialog.setAttribute('open', '');
-    setTimeout(() => document.getElementById('installDialogDone').focus(), 100);
-  }
-  function closeInstallDialog() {
-    try { installDialog.close(); } catch (e) { installDialog.removeAttribute('open'); }
-    if (lastFocusBeforeInstall && typeof lastFocusBeforeInstall.focus === 'function') {
-      lastFocusBeforeInstall.focus();
-    }
-  }
-  document.getElementById('installDialogClose').addEventListener('click', closeInstallDialog);
-  document.getElementById('installDialogDone').addEventListener('click', closeInstallDialog);
-  installDialog.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeInstallDialog();
-  });
-
-  // Comportamento principal do botão Instalar
-  installBtn.addEventListener('click', async () => {
-    if (deferredInstallPrompt) {
-      // Browser suporta — usa prompt nativo
-      deferredInstallPrompt.prompt();
-      const choice = await deferredInstallPrompt.userChoice;
-      if (choice && choice.outcome === 'accepted') {
-        announce('App instalada com sucesso.');
+      if (window.matchMedia('(display-mode: standalone)').matches
+          || window.navigator.standalone === true) {
         installBtn.hidden = true;
       }
-      deferredInstallPrompt = null;
-    } else {
-      // Sem prompt nativo — mostra instruções manuais
-      openInstallDialog();
+
+      window.addEventListener('appinstalled', () => {
+        installBtn.hidden = true;
+        deferredInstallPrompt = null;
+        announce('App instalada e disponível offline.');
+      });
     }
-  });
-
-  // Esconde o botão se já estiver instalada
-  if (window.matchMedia('(display-mode: standalone)').matches
-      || window.navigator.standalone === true) {
-    installBtn.hidden = true;
+  } catch (err) {
+    console.error('[Install] erro:', err);
   }
-
-  window.addEventListener('appinstalled', () => {
-    installBtn.hidden = true;
-    deferredInstallPrompt = null;
-    announce('App instalada e disponível offline.');
-  });
 
   /* ====================================================================
      17. SERVICE WORKER — funcionamento offline
