@@ -397,15 +397,17 @@
     }
 
     /* ================================================================
-       9. NAVEGAÇÃO (TABS)
+       9. NAVEGAÇÃO RÁPIDA (anchors)
        ================================================================ */
-    .tablist {
+    .page-nav {
       display: flex; flex-wrap: wrap;
       gap: var(--sp-2);
       justify-content: center;
       padding: 0 var(--sp-4) var(--sp-4);
     }
-    .tab-btn {
+    .nav-link {
+      text-decoration: none;
+      display: inline-flex; align-items: center;
       min-height: var(--touch);
       padding: var(--sp-3) var(--sp-4);
       background: var(--superficie);
@@ -413,24 +415,31 @@
       border: 2px solid var(--azul);
       border-radius: var(--radius);
       font-family: inherit; font-size: 0.9rem;
-      font-weight: 700; cursor: pointer;
-      transition: background-color 0.15s, color 0.15s;
+      font-weight: 700;
+      transition: background-color 0.15s, color 0.15s, transform 0.15s;
     }
-    .tab-btn[aria-selected="true"] {
-      background: var(--azul); color: white;
-    }
-    .tab-btn:hover:not([aria-selected="true"]) {
-      background: var(--borda-suave);
-    }
-    body:not(.reduced-motion) .tab-btn:hover {
+    .nav-link:hover { background: var(--azul); color: white; }
+    body:not(.reduced-motion) .nav-link:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
     }
+    .nav-link:focus-visible { outline: 3px solid var(--foco); outline-offset: 3px; }
+    .nav-link[aria-current="true"] {
+      background: var(--azul); color: white;
+    }
 
-    .tabpanel { display: none; padding: 0 var(--sp-4) var(--sp-7); }
-    .tabpanel[data-active="true"] { display: block; }
-    body:not(.reduced-motion) .tabpanel[data-active="true"] {
-      animation: fadeIn 0.25s ease;
+    /* Espaçamento e separação entre secções */
+    main > section[id] {
+      scroll-margin-top: 90px;
+      padding-bottom: var(--sp-7);
+      margin-bottom: var(--sp-5);
+    }
+    main > section[id] + section[id] {
+      border-top: 1px solid var(--borda-suave);
+      padding-top: var(--sp-6);
+    }
+    body:not(.reduced-motion) section[id] {
+      animation: fadeIn 0.3s ease;
     }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
@@ -1015,10 +1024,10 @@
        ================================================================ */
     @media print {
       body { background: white; color: black; filter: none !important; }
-      .a11y-bar, .skip-link, .tablist, .filter-controls,
+      .a11y-bar, .skip-link, .page-nav, .filter-controls,
       .wheel-wrapper, .speak-btn, .fab, .chat-window,
       .form-row, .btn, .a11y-panel, .tutorial-dialog, .page-footer { display: none !important; }
-      .tabpanel { display: block !important; }
+      main > section[id] { display: block !important; page-break-inside: avoid; }
       .surface, .label-preview {
         box-shadow: none !important; border: 2px solid black !important;
         page-break-inside: avoid;
@@ -1170,21 +1179,21 @@
   </header>
 
   <!-- ================================================================
-       NAVEGAÇÃO POR SEPARADORES
+       NAVEGAÇÃO RÁPIDA — atalhos âncora para cada secção
        ================================================================ -->
-  <nav class="tablist" role="tablist" aria-label="Secções da aplicação">
-    <button class="tab-btn" role="tab" id="tab-coloradd" aria-controls="panel-coloradd" aria-selected="true" tabindex="0">
+  <nav class="page-nav" aria-label="Navegação rápida das secções">
+    <a class="nav-link" href="#secao-coloradd">
       <span class="deco-emoji" aria-hidden="true">🎨 </span>ColorADD
-    </button>
-    <button class="tab-btn" role="tab" id="tab-cdu" aria-controls="panel-cdu" aria-selected="false" tabindex="-1">
+    </a>
+    <a class="nav-link" href="#secao-cdu">
       <span class="deco-emoji" aria-hidden="true">📚 </span>Classes CDU
-    </button>
-    <button class="tab-btn" role="tab" id="tab-combinar" aria-controls="panel-combinar" aria-selected="false" tabindex="-1">
+    </a>
+    <a class="nav-link" href="#secao-combinar">
       <span class="deco-emoji" aria-hidden="true">🔗 </span>Combinar
-    </button>
-    <button class="tab-btn" role="tab" id="tab-contacto" aria-controls="panel-contacto" aria-selected="false" tabindex="-1">
+    </a>
+    <a class="nav-link" href="#secao-contacto">
       <span class="deco-emoji" aria-hidden="true">✉️ </span>Contacto
-    </button>
+    </a>
   </nav>
 
   <!-- ================================================================
@@ -1195,10 +1204,10 @@
     <!-- ============================================================
          PAINEL: COLORADD
          ============================================================ -->
-    <section role="tabpanel" id="panel-coloradd" aria-labelledby="tab-coloradd" data-active="true" tabindex="0">
+    <section id="secao-coloradd" aria-labelledby="h2-coloradd">
       <div class="section-head">
-        <h2>Roda de cores ColorADD</h2>
-        <button class="speak-btn" data-speak="panel-coloradd" aria-pressed="false">
+        <h2 id="h2-coloradd">Roda de cores ColorADD</h2>
+        <button class="speak-btn" data-speak="secao-coloradd" aria-pressed="false">
           <span aria-hidden="true">🔈</span>
           <span>Ouvir esta secção</span>
         </button>
@@ -1287,10 +1296,10 @@
     <!-- ============================================================
          PAINEL: CDU
          ============================================================ -->
-    <section role="tabpanel" id="panel-cdu" aria-labelledby="tab-cdu" data-active="false" tabindex="0">
+    <section id="secao-cdu" aria-labelledby="h2-cdu">
       <div class="section-head">
-        <h2><span class="deco-emoji" aria-hidden="true">📚 </span>Classes principais da CDU</h2>
-        <button class="speak-btn" data-speak="panel-cdu" aria-pressed="false">
+        <h2 id="h2-cdu"><span class="deco-emoji" aria-hidden="true">📚 </span>Classes principais da CDU</h2>
+        <button class="speak-btn" data-speak="secao-cdu" aria-pressed="false">
           <span aria-hidden="true">🔈</span>
           <span>Ouvir esta secção</span>
         </button>
@@ -1309,10 +1318,10 @@
     <!-- ============================================================
          PAINEL: COMBINAR
          ============================================================ -->
-    <section role="tabpanel" id="panel-combinar" aria-labelledby="tab-combinar" data-active="false" tabindex="0">
+    <section id="secao-combinar" aria-labelledby="h2-combinar">
       <div class="section-head">
-        <h2><span class="deco-emoji" aria-hidden="true">🔗 </span>Combinar ColorADD + CDU</h2>
-        <button class="speak-btn" data-speak="panel-combinar" aria-pressed="false">
+        <h2 id="h2-combinar"><span class="deco-emoji" aria-hidden="true">🔗 </span>Combinar ColorADD + CDU</h2>
+        <button class="speak-btn" data-speak="secao-combinar" aria-pressed="false">
           <span aria-hidden="true">🔈</span>
           <span>Ouvir esta secção</span>
         </button>
@@ -1379,10 +1388,10 @@
     <!-- ============================================================
          PAINEL: CONTACTO
          ============================================================ -->
-    <section role="tabpanel" id="panel-contacto" aria-labelledby="tab-contacto" data-active="false" tabindex="0">
+    <section id="secao-contacto" aria-labelledby="h2-contacto">
       <div class="section-head">
-        <h2><span class="deco-emoji" aria-hidden="true">✉️ </span>Contacto</h2>
-        <button class="speak-btn" data-speak="panel-contacto" aria-pressed="false">
+        <h2 id="h2-contacto"><span class="deco-emoji" aria-hidden="true">✉️ </span>Contacto</h2>
+        <button class="speak-btn" data-speak="secao-contacto" aria-pressed="false">
           <span aria-hidden="true">🔈</span>
           <span>Ouvir esta secção</span>
         </button>
@@ -1686,6 +1695,8 @@
     body.classList.toggle('high-contrast', settings.contrast);
     body.classList.toggle('reduced-motion', settings.motion);
     body.classList.toggle('calm-mode', settings.calm);
+    // O elemento html também precisa para controlar scroll-behavior
+    document.documentElement.style.scrollBehavior = settings.motion ? 'auto' : 'smooth';
 
     // Atualiza UI de switches
     const $ = id => document.getElementById(id);
@@ -1811,12 +1822,20 @@
     });
   });
 
-  // "Ouvir página"
+  // "Ouvir página" — lê a secção mais visível no viewport
   document.getElementById('ttsPlayPage').addEventListener('click', () => {
     if (isSpeaking) { stopSpeaking(); return; }
     const main = document.getElementById('main');
-    const activePanel = main.querySelector('[data-active="true"]');
-    const target = activePanel || main;
+    // Encontra a secção com mais área visível
+    const sections = main.querySelectorAll('section[id]');
+    let mostVisible = null, mostVisibleArea = 0;
+    const vh = window.innerHeight;
+    sections.forEach(s => {
+      const r = s.getBoundingClientRect();
+      const visible = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+      if (visible > mostVisibleArea) { mostVisibleArea = visible; mostVisible = s; }
+    });
+    const target = mostVisible || main;
     const text = extractReadableText(target);
     if (!speak(text)) announce('A síntese de voz não está disponível neste dispositivo.');
   });
@@ -1905,36 +1924,34 @@
   });
 
   /* ====================================================================
-     6. TABS — keyboard nav + ARIA
+     6. NAVEGAÇÃO ÂNCORA — scroll-spy para destacar a secção visível
      ==================================================================== */
-  const tabBtns = Array.from(document.querySelectorAll('[role="tab"]'));
-  const tabPanels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('main > section[id]');
 
-  function activateTab(btn, focus = true) {
-    tabBtns.forEach(b => {
-      const active = b === btn;
-      b.setAttribute('aria-selected', String(active));
-      b.tabIndex = active ? 0 : -1;
-    });
-    tabPanels.forEach(p => {
-      const active = p.id === btn.getAttribute('aria-controls');
-      p.dataset.active = String(active);
-    });
-    if (focus) btn.focus();
-    playClickSound();
-  }
-
-  tabBtns.forEach((btn, i) => {
-    btn.addEventListener('click', () => activateTab(btn, false));
-    btn.addEventListener('keydown', e => {
-      let target = null;
-      if (e.key === 'ArrowRight') target = tabBtns[(i + 1) % tabBtns.length];
-      else if (e.key === 'ArrowLeft') target = tabBtns[(i - 1 + tabBtns.length) % tabBtns.length];
-      else if (e.key === 'Home') target = tabBtns[0];
-      else if (e.key === 'End') target = tabBtns[tabBtns.length - 1];
-      if (target) { e.preventDefault(); activateTab(target); }
-    });
+  // Som ao clicar (mantém feedback)
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => playClickSound());
   });
+
+  // Destaque dinâmico do link da secção em vista
+  if ('IntersectionObserver' in window && sections.length) {
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navLinks.forEach(link => {
+            if (link.getAttribute('href') === '#' + id) {
+              link.setAttribute('aria-current', 'true');
+            } else {
+              link.removeAttribute('aria-current');
+            }
+          });
+        }
+      });
+    }, { rootMargin: '-30% 0px -55% 0px', threshold: 0 });
+    sections.forEach(s => spy.observe(s));
+  }
 
   /* ====================================================================
      7. FILTROS DE DALTONISMO
