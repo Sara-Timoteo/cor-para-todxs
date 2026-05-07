@@ -79,11 +79,11 @@
       --fundo: #F3F4F6;
       --superficie: #FFFFFF;
       --texto: #1F2937;
-      --texto-suave: #4B5563;
-      --borda: #D1D5DB;
+      --texto-suave: #374151;
+      --borda: #9CA3AF;
       --borda-suave: #E5E7EB;
       --foco: #7C3AED;
-      --sucesso: #059669;
+      --sucesso: #047857;
       --erro: #B91C1C;
 
       /* Tipografia */
@@ -333,7 +333,7 @@
     }
     .switch-track {
       position: absolute; inset: 0;
-      background: var(--borda); border-radius: 999px;
+      background: #6B7280; border-radius: 999px;
       transition: background-color 0.2s;
       pointer-events: none;
     }
@@ -342,6 +342,7 @@
       top: 3px; left: 3px;
       width: 22px; height: 22px;
       background: white; border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
       transition: transform 0.2s;
       pointer-events: none;
     }
@@ -634,7 +635,12 @@
 
     /* Form inputs */
     .form-row { display: grid; gap: var(--sp-2); margin: var(--sp-3) 0; }
-    .form-row label { font-weight: 600; font-size: 0.95rem; }
+    .form-row label, .form-step-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: block;
+      margin: 0;
+    }
     .form-row .req { color: var(--erro); }
     input[type="text"], input[type="email"], select, textarea {
       width: 100%;
@@ -672,7 +678,7 @@
     .btn-primary { background: var(--azul); color: white; border-color: var(--azul); }
     .btn-primary:hover { background: #1d4ed8; }
     .btn-success { background: var(--sucesso); color: white; border-color: var(--sucesso); }
-    .btn-success:hover { background: #047857; }
+    .btn-success:hover { background: #065F46; }
     .btn-block { width: 100%; }
     body:not(.reduced-motion) .btn:active { transform: scale(0.98); }
 
@@ -908,7 +914,7 @@
       border: none; border-radius: var(--radius);
       cursor: pointer; font-size: 1.1rem;
     }
-    .chat-send:hover { background: #047857; }
+    .chat-send:hover { background: #065F46; }
 
     /* ================================================================
        19. FOOTER
@@ -1334,7 +1340,7 @@
           <p>Crie etiquetas completas com símbolo ColorADD e classificação CDU.</p>
 
           <div class="form-row">
-            <label id="lbl-pickColor">1. Escolha o símbolo ColorADD:</label>
+            <p id="lbl-pickColor" class="form-step-label">1. Escolha o símbolo ColorADD:</p>
             <div class="symbol-picker" role="group" aria-labelledby="lbl-pickColor">
               <button class="symbol-pick" data-color="azul" aria-label="Azul" aria-pressed="false">▲</button>
               <button class="symbol-pick" data-color="amarelo" aria-label="Amarelo" aria-pressed="false">◆</button>
@@ -1633,29 +1639,29 @@
      1. DATA
      ==================================================================== */
   const coloraddData = {
-    azul:     { symbol: '▲',  name: 'Azul',     type: 'primaria',   hex: '#2563EB', details: 'Triângulo para cima. Ciências, tecnologia, história.', freq: 261.63 },
-    amarelo:  { symbol: '◆',  name: 'Amarelo',  type: 'primaria',   hex: '#F59E0B', details: 'Losango. Filosofia, religião, arte.', freq: 329.63 },
-    vermelho: { symbol: '●',  name: 'Vermelho', type: 'primaria',   hex: '#DC2626', details: 'Círculo. Ciências sociais, literatura.', freq: 392.00 },
-    preto:    { symbol: '■',  name: 'Preto',    type: 'primaria',   hex: '#111827', details: 'Quadrado preenchido. Referência, manuais.', freq: 196.00 },
-    branco:   { symbol: '□',  name: 'Branco',   type: 'primaria',   hex: '#F9FAFB', details: 'Quadrado vazio. Generalidades, novidades.', freq: 523.25 },
-    verde:    { symbol: '▲◆', name: 'Verde',    type: 'secundaria', hex: '#10B981', details: 'Azul + Amarelo. Ecopontos, natureza, saúde.', freq: [261.63, 329.63] },
-    laranja:  { symbol: '◆●', name: 'Laranja',  type: 'secundaria', hex: '#F97316', details: 'Amarelo + Vermelho. Energia, criatividade, infância.', freq: [329.63, 392.00] },
-    roxo:     { symbol: '▲●', name: 'Roxo',     type: 'secundaria', hex: '#8B5CF6', details: 'Azul + Vermelho. Fantasia, espiritualidade, poesia.', freq: [261.63, 392.00] },
-    castanho: { symbol: '◆■', name: 'Castanho', type: 'secundaria', hex: '#92400E', details: 'Amarelo + Preto. Terra, arquivo, documentos históricos.', freq: [329.63, 196.00] },
-    rosa:     { symbol: '●□', name: 'Rosa',     type: 'secundaria', hex: '#EC4899', details: 'Vermelho + Branco. Romance, infância, suavidade.', freq: [392.00, 523.25] },
-    cinzento: { symbol: '■□', name: 'Cinzento', type: 'secundaria', hex: '#6B7280', details: 'Preto + Branco. Neutralidade, transição, notas de rodapé.', freq: [196.00, 523.25] }
+    azul:     { symbol: '▲',  name: 'Azul',     type: 'primaria',   hex: '#2563EB', hexText: '#1E40AF', details: 'Triângulo para cima. Ciências, tecnologia, história.', freq: 261.63 },
+    amarelo:  { symbol: '◆',  name: 'Amarelo',  type: 'primaria',   hex: '#F59E0B', hexText: '#92400E', details: 'Losango. Filosofia, religião, arte.', freq: 329.63 },
+    vermelho: { symbol: '●',  name: 'Vermelho', type: 'primaria',   hex: '#DC2626', hexText: '#991B1B', details: 'Círculo. Ciências sociais, literatura.', freq: 392.00 },
+    preto:    { symbol: '■',  name: 'Preto',    type: 'primaria',   hex: '#111827', hexText: '#111827', details: 'Quadrado preenchido. Referência, manuais.', freq: 196.00 },
+    branco:   { symbol: '□',  name: 'Branco',   type: 'primaria',   hex: '#F9FAFB', hexText: '#374151', details: 'Quadrado vazio. Generalidades, novidades.', freq: 523.25 },
+    verde:    { symbol: '▲◆', name: 'Verde',    type: 'secundaria', hex: '#10B981', hexText: '#065F46', details: 'Azul + Amarelo. Ecopontos, natureza, saúde.', freq: [261.63, 329.63] },
+    laranja:  { symbol: '◆●', name: 'Laranja',  type: 'secundaria', hex: '#F97316', hexText: '#9A3412', details: 'Amarelo + Vermelho. Energia, criatividade, infância.', freq: [329.63, 392.00] },
+    roxo:     { symbol: '▲●', name: 'Roxo',     type: 'secundaria', hex: '#8B5CF6', hexText: '#5B21B6', details: 'Azul + Vermelho. Fantasia, espiritualidade, poesia.', freq: [261.63, 392.00] },
+    castanho: { symbol: '◆■', name: 'Castanho', type: 'secundaria', hex: '#92400E', hexText: '#78350F', details: 'Amarelo + Preto. Terra, arquivo, documentos históricos.', freq: [329.63, 196.00] },
+    rosa:     { symbol: '●□', name: 'Rosa',     type: 'secundaria', hex: '#EC4899', hexText: '#9F1239', details: 'Vermelho + Branco. Romance, infância, suavidade.', freq: [392.00, 523.25] },
+    cinzento: { symbol: '■□', name: 'Cinzento', type: 'secundaria', hex: '#6B7280', hexText: '#374151', details: 'Preto + Branco. Neutralidade, transição, notas de rodapé.', freq: [196.00, 523.25] }
   };
 
   const cduClasses = [
-    { number: '0', theme: 'Generalidades. Ciência e conhecimento',                    color: '#8B5CF6', sug: 'branco'   },
-    { number: '1', theme: 'Filosofia. Psicologia',                                    color: '#EC4899', sug: 'amarelo'  },
-    { number: '2', theme: 'Religião. Teologia',                                       color: '#F59E0B', sug: 'amarelo'  },
-    { number: '3', theme: 'Ciências sociais. Política. Economia. Direito',            color: '#10B981', sug: 'verde'    },
-    { number: '5', theme: 'Matemática. Ciências naturais',                            color: '#10B981', sug: 'azul'     },
-    { number: '6', theme: 'Ciências aplicadas. Medicina. Tecnologia',                 color: '#3B82F6', sug: 'azul'     },
-    { number: '7', theme: 'Arte. Arquitetura. Jogos. Desporto',                       color: '#2563EB', sug: 'azul'     },
-    { number: '8', theme: 'Língua. Linguística. Literatura',                          color: '#F59E0B', sug: 'amarelo'  },
-    { number: '9', theme: 'Geografia. Biografia. História',                           color: '#DC2626', sug: 'vermelho' }
+    { number: '0', theme: 'Generalidades. Ciência e conhecimento',                    color: '#8B5CF6', colorDark: '#5B21B6', sug: 'branco'   },
+    { number: '1', theme: 'Filosofia. Psicologia',                                    color: '#EC4899', colorDark: '#9F1239', sug: 'amarelo'  },
+    { number: '2', theme: 'Religião. Teologia',                                       color: '#F59E0B', colorDark: '#92400E', sug: 'amarelo'  },
+    { number: '3', theme: 'Ciências sociais. Política. Economia. Direito',            color: '#10B981', colorDark: '#065F46', sug: 'verde'    },
+    { number: '5', theme: 'Matemática. Ciências naturais',                            color: '#10B981', colorDark: '#065F46', sug: 'azul'     },
+    { number: '6', theme: 'Ciências aplicadas. Medicina. Tecnologia',                 color: '#3B82F6', colorDark: '#1D4ED8', sug: 'azul'     },
+    { number: '7', theme: 'Arte. Arquitetura. Jogos. Desporto',                       color: '#2563EB', colorDark: '#1E40AF', sug: 'azul'     },
+    { number: '8', theme: 'Língua. Linguística. Literatura',                          color: '#F59E0B', colorDark: '#92400E', sug: 'amarelo'  },
+    { number: '9', theme: 'Geografia. Biografia. História',                           color: '#DC2626', colorDark: '#991B1B', sug: 'vermelho' }
   ];
 
   /* ====================================================================
@@ -1994,7 +2000,7 @@
 
     const titleVal = document.getElementById('book-title').value || 'Título do recurso';
     document.getElementById('label-preview').innerHTML =
-      `<span style="font-size:2.2rem; margin-right:0.6rem; color:${d.hex};">${d.symbol}</span><span style="font-size:1.2rem;">${escapeHtml(titleVal)}</span>`;
+      `<span style="font-size:2.2rem; margin-right:0.6rem; color:${d.hexText};">${d.symbol}</span><span style="font-size:1.2rem;">${escapeHtml(titleVal)}</span>`;
 
     document.querySelectorAll('.wheel-btn, .sec-btn').forEach(b =>
       b.setAttribute('aria-pressed', String(b.dataset.color === key))
@@ -2040,7 +2046,7 @@
       btn.setAttribute('aria-pressed', 'false');
       btn.dataset.cdu = c.number;
       btn.innerHTML =
-        `<span class="cdu-num" style="color:${c.color}">${c.number}</span>
+        `<span class="cdu-num" style="color:${c.colorDark}">${c.number}</span>
          <span class="cdu-theme">${c.theme}</span>
          <span class="cdu-sug">Sugerido: ${coloraddData[c.sug].symbol} ${coloraddData[c.sug].name}</span>`;
       btn.addEventListener('click', () => {
@@ -2085,7 +2091,7 @@
     const t = document.getElementById('combinedTitle').value || 'Título';
     document.getElementById('combinedLabel').innerHTML =
       `<div style="font-size:0.9rem; color:var(--texto-suave); font-style:italic;">CDU ${c.number} | ${c.theme.split('.')[0]}</div>
-       <div style="font-size:2rem; margin:0.5rem 0; color:${d.hex};">${d.symbol}</div>
+       <div style="font-size:2rem; margin:0.5rem 0; color:${d.hexText};">${d.symbol}</div>
        <div style="font-size:1.2rem;">${escapeHtml(t)}</div>`;
   }
   document.getElementById('generateCombined').addEventListener('click', () => {
