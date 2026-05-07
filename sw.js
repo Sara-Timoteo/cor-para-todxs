@@ -3,7 +3,7 @@
    Estrategia: app-shell em cache-first; fontes/CDN em stale-while-revalidate.
    ==================================================================== */
 
-const CACHE_VERSION = 'cor-para-todxs-v9';
+const CACHE_VERSION = 'cor-para-todxs-v10';
 const APP_SHELL = [
   './',
   './index.html',
