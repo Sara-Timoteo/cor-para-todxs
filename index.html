@@ -1074,106 +1074,6 @@
     </button>
   </div>
 
-  <!-- ================================================================
-       PAINEL DE ACESSIBILIDADE
-       ================================================================ -->
-  <dialog class="a11y-panel" id="a11yPanel" aria-labelledby="a11y-title">
-    <div class="a11y-panel-header">
-      <h2 id="a11y-title">Opções de acessibilidade</h2>
-      <button class="chat-close" id="a11yPanelClose" aria-label="Fechar painel" style="color:var(--texto)">✕</button>
-    </div>
-    <div class="a11y-panel-body">
-
-      <fieldset>
-        <legend>Tamanho do texto</legend>
-        <div class="font-size-row" role="radiogroup" aria-label="Tamanho do texto">
-          <button type="button" data-size="0" aria-pressed="false" aria-label="Compacto">A</button>
-          <button type="button" data-size="1" aria-pressed="true" aria-label="Padrão" style="font-size:1.1rem">A</button>
-          <button type="button" data-size="2" aria-pressed="false" aria-label="Grande" style="font-size:1.3rem">A</button>
-          <button type="button" data-size="3" aria-pressed="false" aria-label="Extra grande" style="font-size:1.55rem">A</button>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Modos visuais</legend>
-
-        <div class="a11y-option">
-          <label for="optDyslexia">
-            Fonte para dislexia
-            <span class="hint">Espaçamento amplo entre letras e palavras; carrega OpenDyslexic se disponível.</span>
-          </label>
-          <span class="switch">
-            <input type="checkbox" id="optDyslexia">
-            <span class="switch-track" aria-hidden="true"></span>
-          </span>
-        </div>
-
-        <div class="a11y-option">
-          <label for="optContrast">
-            Alto contraste
-            <span class="hint">Fundo preto, texto branco, bordas reforçadas.</span>
-          </label>
-          <span class="switch">
-            <input type="checkbox" id="optContrast">
-            <span class="switch-track" aria-hidden="true"></span>
-          </span>
-        </div>
-
-        <div class="a11y-option">
-          <label for="optMotion">
-            Movimento reduzido
-            <span class="hint">Desativa animações e transições.</span>
-          </label>
-          <span class="switch">
-            <input type="checkbox" id="optMotion">
-            <span class="switch-track" aria-hidden="true"></span>
-          </span>
-        </div>
-
-        <div class="a11y-option">
-          <label for="optCalm">
-            Modo calmo
-            <span class="hint">Paleta dessaturada, menos estímulos visuais, sem emojis decorativos.</span>
-          </label>
-          <span class="switch">
-            <input type="checkbox" id="optCalm">
-            <span class="switch-track" aria-hidden="true"></span>
-          </span>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Sons & feedback</legend>
-
-        <div class="a11y-option">
-          <label for="optColorSounds">
-            Sons das cores
-            <span class="hint">Toca uma frequência musical ao escolher cada cor.</span>
-          </label>
-          <span class="switch">
-            <input type="checkbox" id="optColorSounds">
-            <span class="switch-track" aria-hidden="true"></span>
-          </span>
-        </div>
-
-        <div class="a11y-option">
-          <label for="optVibrate">
-            Vibração no dispositivo
-            <span class="hint">Vibra ao selecionar uma cor (apenas mobile).</span>
-          </label>
-          <span class="switch">
-            <input type="checkbox" id="optVibrate" checked>
-            <span class="switch-track" aria-hidden="true"></span>
-          </span>
-        </div>
-      </fieldset>
-
-    </div>
-    <div class="a11y-panel-footer">
-      <button class="btn-secondary" id="a11yReset">Repor predefinições</button>
-      <button class="btn-primary" id="a11yPanelDone">Concluído</button>
-    </div>
-  </dialog>
 
   <!-- Anunciador para leitores de ecrã -->
   <div id="liveAnnouncer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
@@ -1313,14 +1213,14 @@
         </button>
       </div>
 
-      <section class="surface">
+      <div class="surface">
         <p>Selecione uma classe CDU para associar a um símbolo ColorADD e gerar etiquetas temáticas para a biblioteca.</p>
         <div class="cdu-grid" id="cduGrid" role="list" aria-label="Lista de classes CDU"></div>
         <div class="tip-box">
           <strong><span class="deco-emoji" aria-hidden="true">💡 </span>Dica:</strong>
           As cores primárias são ideais para as classes principais. As secundárias funcionam bem para subclasses ou coleções temáticas específicas.
         </div>
-      </section>
+      </div>
     </section>
 
     <!-- ============================================================
@@ -1336,7 +1236,7 @@
       </div>
 
       <div class="grid-2">
-        <section class="surface">
+        <div class="surface">
           <p>Crie etiquetas completas com símbolo ColorADD e classificação CDU.</p>
 
           <div class="form-row">
@@ -1377,7 +1277,7 @@
               <span class="deco-emoji" aria-hidden="true">🖨️ </span>Imprimir
             </button>
           </div>
-        </section>
+        </div>
 
         <section class="surface">
           <h3><span class="deco-emoji" aria-hidden="true">📖 </span>Exemplos de aplicação</h3>
@@ -1405,7 +1305,7 @@
         </button>
       </div>
 
-      <section class="surface">
+      <div class="surface">
         <div class="contact-intro">
           <p style="margin:0;"><strong>Tem dúvidas, sugestões ou quer reportar um problema?</strong> Use o formulário abaixo ou envie email diretamente.</p>
         </div>
@@ -1438,14 +1338,14 @@
           <input type="hidden" name="_subject" value="[Cor para Todxs] Nova mensagem">
 
           <div class="form-row">
-            <label for="contact-name">Nome <span class="req" aria-label="obrigatório">*</span></label>
-            <input type="text" id="contact-name" name="name" required aria-required="true" autocomplete="name">
+            <label for="contact-name">Nome <span class="req" aria-hidden="true">*</span><span class="sr-only"> (obrigatório)</span></label>
+            <input type="text" id="contact-name" name="name" required autocomplete="name">
             <p class="field-error" id="err-name">Por favor indique o seu nome.</p>
           </div>
 
           <div class="form-row">
-            <label for="contact-email">Email <span class="req" aria-label="obrigatório">*</span></label>
-            <input type="email" id="contact-email" name="email" required aria-required="true" autocomplete="email">
+            <label for="contact-email">Email <span class="req" aria-hidden="true">*</span><span class="sr-only"> (obrigatório)</span></label>
+            <input type="email" id="contact-email" name="email" required autocomplete="email">
             <p class="field-error" id="err-email">Por favor indique um email válido.</p>
           </div>
 
@@ -1462,8 +1362,8 @@
           </div>
 
           <div class="form-row">
-            <label for="contact-message">Mensagem <span class="req" aria-label="obrigatório">*</span></label>
-            <textarea id="contact-message" name="message" required aria-required="true" minlength="10"
+            <label for="contact-message">Mensagem <span class="req" aria-hidden="true">*</span><span class="sr-only"> (obrigatório)</span></label>
+            <textarea id="contact-message" name="message" required minlength="10"
               placeholder="Escreva aqui a sua mensagem (mínimo 10 caracteres)"></textarea>
             <p class="field-error" id="err-message">A mensagem deve ter pelo menos 10 caracteres.</p>
           </div>
@@ -1478,7 +1378,7 @@
         <p style="margin-top:var(--sp-4); font-size:0.9rem; color:var(--texto-suave);">
           Em alternativa, envie email diretamente para <a id="fallbackEmailLink" href="mailto:contacto@exemplo.pt">contacto@exemplo.pt</a>.
         </p>
-      </section>
+      </div>
     </section>
 
   </main>
@@ -1557,6 +1457,107 @@
     <div class="tutorial-footer">
       <button class="btn btn-skip" id="tutorialPrev" disabled>← Anterior</button>
       <button class="btn btn-primary" id="tutorialNext">Próximo →</button>
+    </div>
+  </dialog>
+
+  <!-- ================================================================
+       PAINEL DE ACESSIBILIDADE
+       ================================================================ -->
+  <dialog class="a11y-panel" id="a11yPanel" aria-labelledby="a11y-title">
+    <div class="a11y-panel-header">
+      <h2 id="a11y-title">Opções de acessibilidade</h2>
+      <button class="chat-close" id="a11yPanelClose" aria-label="Fechar painel" style="color:var(--texto)">✕</button>
+    </div>
+    <div class="a11y-panel-body">
+
+      <fieldset>
+        <legend>Tamanho do texto</legend>
+        <div class="font-size-row" role="radiogroup" aria-label="Tamanho do texto">
+          <button type="button" data-size="0" aria-pressed="false" aria-label="Compacto">A</button>
+          <button type="button" data-size="1" aria-pressed="true" aria-label="Padrão" style="font-size:1.1rem">A</button>
+          <button type="button" data-size="2" aria-pressed="false" aria-label="Grande" style="font-size:1.3rem">A</button>
+          <button type="button" data-size="3" aria-pressed="false" aria-label="Extra grande" style="font-size:1.55rem">A</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Modos visuais</legend>
+
+        <div class="a11y-option">
+          <label for="optDyslexia">
+            Fonte para dislexia
+            <span class="hint">Espaçamento amplo entre letras e palavras; carrega OpenDyslexic se disponível.</span>
+          </label>
+          <span class="switch">
+            <input type="checkbox" id="optDyslexia">
+            <span class="switch-track" aria-hidden="true"></span>
+          </span>
+        </div>
+
+        <div class="a11y-option">
+          <label for="optContrast">
+            Alto contraste
+            <span class="hint">Fundo preto, texto branco, bordas reforçadas.</span>
+          </label>
+          <span class="switch">
+            <input type="checkbox" id="optContrast">
+            <span class="switch-track" aria-hidden="true"></span>
+          </span>
+        </div>
+
+        <div class="a11y-option">
+          <label for="optMotion">
+            Movimento reduzido
+            <span class="hint">Desativa animações e transições.</span>
+          </label>
+          <span class="switch">
+            <input type="checkbox" id="optMotion">
+            <span class="switch-track" aria-hidden="true"></span>
+          </span>
+        </div>
+
+        <div class="a11y-option">
+          <label for="optCalm">
+            Modo calmo
+            <span class="hint">Paleta dessaturada, menos estímulos visuais, sem emojis decorativos.</span>
+          </label>
+          <span class="switch">
+            <input type="checkbox" id="optCalm">
+            <span class="switch-track" aria-hidden="true"></span>
+          </span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Sons & feedback</legend>
+
+        <div class="a11y-option">
+          <label for="optColorSounds">
+            Sons das cores
+            <span class="hint">Toca uma frequência musical ao escolher cada cor.</span>
+          </label>
+          <span class="switch">
+            <input type="checkbox" id="optColorSounds">
+            <span class="switch-track" aria-hidden="true"></span>
+          </span>
+        </div>
+
+        <div class="a11y-option">
+          <label for="optVibrate">
+            Vibração no dispositivo
+            <span class="hint">Vibra ao selecionar uma cor (apenas mobile).</span>
+          </label>
+          <span class="switch">
+            <input type="checkbox" id="optVibrate" checked>
+            <span class="switch-track" aria-hidden="true"></span>
+          </span>
+        </div>
+      </fieldset>
+
+    </div>
+    <div class="a11y-panel-footer">
+      <button class="btn-secondary" id="a11yReset">Repor predefinições</button>
+      <button class="btn-primary" id="a11yPanelDone">Concluído</button>
     </div>
   </dialog>
 
