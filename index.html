@@ -1316,26 +1316,21 @@
 
       <div class="surface">
         <div class="contact-intro">
-          <p style="margin:0;"><strong>Tem dúvidas, sugestões ou quer reportar um problema?</strong> Use o formulário abaixo ou envie email diretamente.</p>
+          <p style="margin:0;"><strong>Tem dúvidas, sugestões ou quer reportar um problema?</strong> Use o formulário abaixo e entraremos em contacto.</p>
         </div>
 
         <!--
           ============================================================
           FORMULÁRIO DE CONTACTO — Formspree (free 50 envios/mês)
           ============================================================
-          Para o ativares:
-          1. Cria conta gratuita em https://formspree.io
-          2. Cria um novo form e copia o ID (ex: xnqkalvb)
-          3. Substitui SEU_ID_FORMSPREE em baixo pelo teu ID
-          4. Substitui o email em mailto: pelo teu email real
-
-          Sem ID configurado, o form usa o fallback mailto: automaticamente.
+          Ativo em: https://formspree.io/f/mojrwbbv
+          Para mudar o destino, cria um form em https://formspree.io
+          e substitui o ID no atributo action abaixo.
           ============================================================
         -->
         <form id="contactForm"
               action="https://formspree.io/f/mojrwbbv"
               method="POST"
-              data-fallback-email="windsidh@gmail.com"
               novalidate>
 
           <!-- Honeypot anti-spam (escondido para humanos) -->
@@ -1383,10 +1378,6 @@
 
           <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
         </form>
-
-        <p style="margin-top:var(--sp-4); font-size:0.9rem; color:var(--texto-suave);">
-          Em alternativa, envie email diretamente para <a id="fallbackEmailLink" href="mailto:contacto@exemplo.pt">contacto@exemplo.pt</a>.
-        </p>
       </div>
     </section>
 
@@ -2135,11 +2126,6 @@
      ==================================================================== */
   const contactForm = document.getElementById('contactForm');
   const formStatus = document.getElementById('formStatus');
-  const fallbackEmail = contactForm.dataset.fallbackEmail || 'contacto@exemplo.pt';
-
-  // Atualizar link mailto fallback
-  document.getElementById('fallbackEmailLink').href = `mailto:${fallbackEmail}`;
-  document.getElementById('fallbackEmailLink').textContent = fallbackEmail;
 
   function validateField(field, errId, condition) {
     const ok = condition();
@@ -2168,22 +2154,7 @@
     }
     if (honeypot.value) return; // bot detected, silent fail
 
-    // Always use mailto fallback (no Formspree configured)
-    const isFormspreeConfigured = contactForm.action.startsWith('https://formspree.io/');
-
-    if (!isFormspreeConfigured) {
-      // Fallback: open mailto link
-      const subject = encodeURIComponent('[Cor para Todxs] ' + (document.getElementById('contact-topic').value || 'Mensagem'));
-      const body = encodeURIComponent(
-        `Nome: ${name.value}\nEmail: ${email.value}\n\nMensagem:\n${message.value}`
-      );
-      window.location.href = `mailto:${fallbackEmail}?subject=${subject}&body=${body}`;
-      formStatus.textContent = 'A abrir o seu cliente de email...';
-      formStatus.dataset.state = 'sending';
-      return;
-    }
-
-    // Send via Formspree
+    // Enviar via Formspree
     formStatus.textContent = 'A enviar mensagem...';
     formStatus.dataset.state = 'sending';
     document.getElementById('contactSubmit').disabled = true;
@@ -2204,9 +2175,9 @@
         throw new Error('Resposta não OK');
       }
     } catch (err) {
-      formStatus.innerHTML = `Não foi possível enviar. Pode escrever diretamente para <a href="mailto:${fallbackEmail}">${fallbackEmail}</a>.`;
+      formStatus.textContent = 'Não foi possível enviar a mensagem. Verifique a ligação à internet e tente novamente.';
       formStatus.dataset.state = 'error';
-      announce('Falha no envio. Use o email alternativo.');
+      announce('Falha no envio. Tente novamente.');
     } finally {
       document.getElementById('contactSubmit').disabled = false;
     }
